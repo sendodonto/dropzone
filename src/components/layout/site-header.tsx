@@ -44,6 +44,7 @@ export async function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           {menuUser ? (
             <>
+              <Link href="/painel" className={buttonVariants({ size: "sm" })}>Meu painel</Link>
               <NotificationBell unread={unread} />
               <UserMenu user={menuUser} />
             </>

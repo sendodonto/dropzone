@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { Bell, Building2, LayoutDashboard, LogOut, Menu, Shield, User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/brand/logo";
@@ -58,10 +58,13 @@ export function UserMenu({ user }: { user: NonNullable<MenuUser> }) {
         <UserAvatar user={user} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="grid">
-          <span className="truncate font-medium text-foreground">{user.name}</span>
-          {user.username && <span className="truncate text-xs font-normal">@{user.username}</span>}
-        </DropdownMenuLabel>
+        {/* Base UI requires a menu label to live inside a group; without it the menu throws on open. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="grid">
+            <span className="truncate font-medium text-foreground">{user.name}</span>
+            {user.username && <span className="truncate text-xs font-normal">@{user.username}</span>}
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href="/painel" />}><LayoutDashboard /> Meu painel</DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/painel/squads" />}><Users /> Meus squads</DropdownMenuItem>
