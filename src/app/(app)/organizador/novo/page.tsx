@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/shared/ui-bits";
+import Link from "next/link";
+import { Lock } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { EmptyState, PageHeader } from "@/components/shared/ui-bits";
 import { TournamentWizard } from "@/components/organizer/tournament-wizard";
 import { requireOrganizer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -7,7 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "Criar campeonato" };
 
 export default async function NewTournamentPage() {
-  const { org } = await requireOrganizer();
+  const { org, viewer } = await requireOrganizer();
+  if (!viewer.canOrganize) return <EmptyState icon={Lock} title="Criação de campeonatos fechada" description="No momento, só a equipe da plataforma cria campeonatos. Você continua podendo jogar e se inscrever normalmente." action={<Link href="/campeonatos" className={buttonVariants()}>Ver campeonatos</Link>} />;
   const supabase = await createClient();
   const [{ data }, { data: seasons }] = await Promise.all([
     supabase.from("platform_settings").select("value").eq("key", "payments_enabled").maybeSingle(),

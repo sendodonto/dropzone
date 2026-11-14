@@ -11,7 +11,7 @@ import type { Tournament } from "@/lib/types";
 export const metadata: Metadata = { title: "Meus campeonatos (organizador)" };
 
 export default async function OrganizerTournaments() {
-  const { org } = await requireOrganizer();
+  const { org, viewer } = await requireOrganizer();
   const supabase = await createClient();
   const { data } = await supabase.from("tournaments")
     .select("*, registrations:tournament_registrations(count)")
@@ -20,7 +20,7 @@ export default async function OrganizerTournaments() {
   const list = (data ?? []) as (Tournament & { registrations: { count: number }[] })[];
   return (
     <div className="grid gap-6">
-      <PageHeader title="Campeonatos" description={`${list.length} no total`} actions={<Link href="/organizador/novo" className={buttonVariants()}><Plus /> Criar campeonato</Link>} />
+      <PageHeader title="Campeonatos" description={`${list.length} no total`} actions={viewer.canOrganize && <Link href="/organizador/novo" className={buttonVariants()}><Plus /> Criar campeonato</Link>} />
       {list.length ? (
         <ul className="divide-y rounded-3xl bg-card">
           {list.map((t) => (
@@ -35,7 +35,7 @@ export default async function OrganizerTournaments() {
             </li>
           ))}
         </ul>
-      ) : <EmptyState icon={Trophy} title="Nenhum campeonato criado" action={<Link href="/organizador/novo" className={buttonVariants()}>Criar o primeiro</Link>} />}
+      ) : <EmptyState icon={Trophy} title="Nenhum campeonato criado" action={viewer.canOrganize ? <Link href="/organizador/novo" className={buttonVariants()}>Criar o primeiro</Link> : undefined} />}
     </div>
   );
 }

@@ -13,7 +13,7 @@ import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type NavItem = { href: string; label: string };
-export type MenuUser = { name: string; username: string | null; avatar: string | null; isAdmin: boolean; isOrganizer: boolean } | null;
+export type MenuUser = { name: string; username: string | null; avatar: string | null; isAdmin: boolean; isOrganizer: boolean; canOrganize: boolean } | null;
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
@@ -69,9 +69,11 @@ export function UserMenu({ user }: { user: NonNullable<MenuUser> }) {
         <DropdownMenuItem render={<Link href="/painel" />}><LayoutDashboard /> Meu painel</DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/painel/squads" />}><Users /> Meus squads</DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/painel/perfil" />}><User /> Perfil</DropdownMenuItem>
-        <DropdownMenuItem render={<Link href={user.isOrganizer ? "/organizador" : "/organizador/comecar"} />}>
-          <Building2 /> {user.isOrganizer ? "Painel do organizador" : "Organizar campeonato"}
-        </DropdownMenuItem>
+        {(user.isOrganizer || user.canOrganize) && (
+          <DropdownMenuItem render={<Link href={user.isOrganizer ? "/organizador" : "/organizador/comecar"} />}>
+            <Building2 /> {user.isOrganizer ? "Painel do organizador" : "Organizar campeonato"}
+          </DropdownMenuItem>
+        )}
         {user.isAdmin && <DropdownMenuItem render={<Link href="/admin" />}><Shield /> Administração</DropdownMenuItem>}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}><LogOut /> Sair</DropdownMenuItem>
@@ -119,9 +121,11 @@ export function MobileNav({ items, user }: { items: NavItem[]; user: MenuUser })
           {user ? (
             <>
               <Link href="/painel" className="rounded-md px-3 py-2.5 text-sm hover:bg-muted">Meu painel</Link>
-              <Link href={user.isOrganizer ? "/organizador" : "/organizador/comecar"} className="rounded-md px-3 py-2.5 text-sm hover:bg-muted">
-                {user.isOrganizer ? "Painel do organizador" : "Organizar campeonato"}
-              </Link>
+              {(user.isOrganizer || user.canOrganize) && (
+                <Link href={user.isOrganizer ? "/organizador" : "/organizador/comecar"} className="rounded-md px-3 py-2.5 text-sm hover:bg-muted">
+                  {user.isOrganizer ? "Painel do organizador" : "Organizar campeonato"}
+                </Link>
+              )}
               {user.isAdmin && <Link href="/admin" className="rounded-md px-3 py-2.5 text-sm hover:bg-muted">Administração</Link>}
             </>
           ) : (

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { listTournaments, regCount } from "@/lib/queries";
 import { formatDate, formatDateTime, formatPoints } from "@/lib/format";
 import { site } from "@/config/site";
+import { getOrganizingOpen } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 type TeamRow = { team_id: string; rank: number; name: string; tag: string; slug: string; logo_url: string | null; points: number; wins: number };
@@ -15,10 +16,11 @@ type PlayerRow = { user_id: string; rank: number; username: string; display_name
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const [all, teamsRank, playersRank] = await Promise.all([
+  const [all, teamsRank, playersRank, organizingOpen] = await Promise.all([
     listTournaments({ limit: 60 }),
     supabase.rpc("get_team_rankings", { p_limit: 5 }),
     supabase.rpc("get_player_rankings", { p_limit: 5 }),
+    getOrganizingOpen(),
   ]);
 
   const active = all.filter((t) => ["registration_open", "registration_closed", "live"].includes(t.status));
@@ -171,9 +173,11 @@ export default async function HomePage() {
           <h2 className="max-w-[16ch] text-4xl text-balance sm:text-5xl">Coloque seu squad no próximo campeonato.</h2>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/cadastro" className={buttonVariants({ size: "lg", className: "h-12 px-6" })}>Criar conta grátis</Link>
-            <Link href="/organizador/comecar" className={cn(buttonVariants({ size: "lg", variant: "ghost" }), "h-12 px-6 text-white hover:bg-white/10 hover:text-white")}>
-              Organizar campeonato <ArrowUpRight />
-            </Link>
+            {organizingOpen && (
+              <Link href="/organizador/comecar" className={cn(buttonVariants({ size: "lg", variant: "ghost" }), "h-12 px-6 text-white hover:bg-white/10 hover:text-white")}>
+                Organizar campeonato <ArrowUpRight />
+              </Link>
+            )}
           </div>
         </div>
       </section>

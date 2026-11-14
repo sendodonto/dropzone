@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { CalendarCog, KeyRound, ListOrdered } from "lucide-react";
-import { PageHeader } from "@/components/shared/ui-bits";
+import Link from "next/link";
+import { CalendarCog, KeyRound, ListOrdered, Lock } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { EmptyState, PageHeader } from "@/components/shared/ui-bits";
 import { requireViewer } from "@/lib/auth";
 import { OrganizerForm } from "@/components/organizer/organizer-form";
 import { createOrganizer } from "@/lib/actions/tournaments";
@@ -11,6 +13,7 @@ export const metadata: Metadata = { title: "Tornar-se organizador" };
 export default async function BecomeOrganizerPage() {
   const viewer = await requireViewer();
   if (viewer.organizers.length) redirect("/organizador");
+  if (!viewer.canOrganize) return <EmptyState icon={Lock} title="Criação de campeonatos fechada" description="No momento, só a equipe da plataforma cria campeonatos. Você continua podendo jogar e se inscrever normalmente." action={<Link href="/campeonatos" className={buttonVariants()}>Ver campeonatos</Link>} />;
   return (
     <div className="grid max-w-3xl gap-8">
       <PageHeader title="Organize seus campeonatos" description="Crie seu perfil de organizador. Você continua podendo jogar normalmente." />

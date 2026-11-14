@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     supabase.from("team_invites").select("id", { count: "exact", head: true }).eq("invited_user_id", viewer.id).eq("status", "pending"),
   ]);
 
-  const groups: NavGroup[] = [
+  const groups: NavGroup[] = ([
     {
       title: "Jogador",
       items: [
@@ -29,13 +29,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         ? [
             { href: "/organizador", label: "Visão geral", icon: "gauge", exact: true },
             { href: "/organizador/campeonatos", label: "Campeonatos", icon: "list" },
-            { href: "/organizador/novo", label: "Criar campeonato", icon: "plus" },
+            ...(viewer.canOrganize ? [{ href: "/organizador/novo", label: "Criar campeonato", icon: "plus" } as const] : []),
             { href: "/organizador/denuncias", label: "Ocorrências", icon: "alert" },
             { href: "/organizador/perfil", label: "Perfil e plano", icon: "org" },
           ]
-        : [{ href: "/organizador/comecar", label: "Tornar-se organizador", icon: "org" }],
+        : viewer.canOrganize ? [{ href: "/organizador/comecar", label: "Tornar-se organizador", icon: "org" }] : [],
     },
-  ];
+  ] satisfies NavGroup[]).filter((g) => g.items.length);
   if (viewer.isAdmin)
     groups.push({ title: "Administração", items: [{ href: "/admin", label: "Painel admin", icon: "shield" }] });
 

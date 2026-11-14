@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Painel do organizador" };
 type Overview = { tournaments: number; active: number; confirmed_teams: number; open_slots: number; pending_results: number; pending_registrations: number; open_disputes: number; open_reports: number; revenue_cents: number };
 
 export default async function OrganizerHome() {
-  const { org } = await requireOrganizer();
+  const { org, viewer } = await requireOrganizer();
   const supabase = await createClient();
   const [{ data: ov }, { data: tournaments }, { data: logs }, { data: payments }] = await Promise.all([
     supabase.rpc("get_organizer_overview", { p_org: org.id }).single(),
@@ -38,7 +38,7 @@ export default async function OrganizerHome() {
     <div className="grid gap-10">
       <PageHeader title={org.name}
         description={org.status === "pending" ? "Seu perfil aguarda aprovação da administração para publicar campeonatos." : org.status === "suspended" ? `Organizador suspenso${org.status_reason ? `: ${org.status_reason}` : ""}.` : undefined}
-        actions={<Link href="/organizador/novo" className={buttonVariants()}><Plus /> Criar campeonato</Link>} />
+        actions={viewer.canOrganize && <Link href="/organizador/novo" className={buttonVariants()}><Plus /> Criar campeonato</Link>} />
 
       {(o.pending_registrations > 0 || o.open_disputes > 0 || o.open_reports > 0 || o.pending_results > 0) && (
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">

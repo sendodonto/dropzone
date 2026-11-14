@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { getOrganizingOpen } from "@/lib/auth";
 import { onboardingSchema, profileSchema, signInSchema, signUpSchema } from "@/lib/validation";
 import { dbError, formObject, invalid } from "@/lib/actions/helpers";
 import type { ActionResult } from "@/lib/types";
@@ -90,7 +91,7 @@ export async function completeOnboarding(_: unknown, fd: FormData): Promise<Acti
   });
   if (error) return dbError(error);
   revalidatePath("/", "layout");
-  redirect(d.intent === "organize" ? "/organizador/comecar" : "/painel");
+  redirect(d.intent === "organize" && (await getOrganizingOpen()) ? "/organizador/comecar" : "/painel");
 }
 
 export async function updateProfile(_: unknown, fd: FormData): Promise<ActionResult> {

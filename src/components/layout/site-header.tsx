@@ -29,6 +29,7 @@ export async function SiteHeader() {
     avatar: viewer.profile.avatar_url,
     isAdmin: viewer.isAdmin,
     isOrganizer: viewer.organizers.length > 0,
+    canOrganize: viewer.canOrganize,
   };
 
   return (

@@ -23,6 +23,32 @@ beforeAll(async () => {
     final: await tid("Final da Temporada"),
     demoSquad: await teamId("demo-squad"),
   };
+  // Most rules below describe an open platform; the organizing gate has its own suite.
+  await db.query("update platform_settings set value = 'true' where key = 'organizing_open'");
+});
+
+describe("organizing gate (organizing_open = false)", () => {
+  it("only official organizers and admins can create organizers or tournaments", async () => {
+    await db.query("update platform_settings set value = 'false' where key = 'organizing_open'");
+    try {
+      const arena = (await db.query<{ id: string }>("select id from organizers where slug = 'arena-demo'")).rows[0].id;
+      const official = (await db.query<{ id: string }>("select id from organizers where is_official limit 1")).rows[0].id;
+      const officialOwner = await userId(db, "dropzone_oficial");
+      expect(await failsAs(db, ids.player, "select public.create_organizer('Liga Nova')")).toMatch(/restrita/);
+      expect(await failsAs(db, ids.org, "insert into tournaments(organizer_id, name, starts_at) values ($1, 'Bloqueado', now() + interval '2 days')", [arena]))
+        .toMatch(/row-level security/);
+      await as(db, officialOwner, async (q) => {
+        const r = await q<{ status: string }>("insert into tournaments(organizer_id, name, starts_at) values ($1, 'Copa Oficial', now() + interval '2 days') returning status", [official]);
+        expect(r.rows[0].status).toBe("draft");
+      });
+      // A draft created while the gate was open cannot be published after it closes.
+      const draft = (await db.query<{ id: string }>("insert into tournaments(organizer_id, name, starts_at) values ($1, 'Rascunho Antigo', now() + interval '2 days') returning id", [arena])).rows[0].id;
+      await expect(db.query("update tournaments set status = 'registration_open' where id = $1", [draft])).rejects.toThrow(/restrita/);
+      await db.query("delete from tournaments where id = $1", [draft]);
+    } finally {
+      await db.query("update platform_settings set value = 'true' where key = 'organizing_open'");
+    }
+  });
 });
 
 describe("accounts & privilege escalation", () => {

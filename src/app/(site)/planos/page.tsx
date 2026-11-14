@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/shared/ui-bits";
 import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { getOrganizingOpen } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Planos para organizadores" };
 
@@ -16,6 +17,7 @@ export default async function PlansPage() {
     supabase.from("platform_settings").select("value").eq("key", "subscriptions_billing_enabled").maybeSingle(),
   ]);
   const billingOn = billing?.value === true;
+  const organizingOpen = await getOrganizingOpen();
   return (
     <div className="mx-auto grid max-w-4xl gap-8 px-4 py-10 sm:px-6">
       <PageHeader title="Planos" description="Comece grátis. O plano Pro é para ligas e organizadores frequentes." />
@@ -29,7 +31,9 @@ export default async function PlansPage() {
               {p.features.map((f) => <li key={f} className="flex gap-2"><Check className="size-4 shrink-0 text-primary-text" aria-hidden />{f}</li>)}
             </ul>
             <div className="mt-6">
-              {p.code === "FREE" ? (
+              {p.code === "FREE" && !organizingOpen ? (
+                <p className="rounded-lg bg-muted p-3 text-center text-sm text-muted-foreground">Criação de campeonatos aberta só para a equipe da plataforma no momento.</p>
+              ) : p.code === "FREE" ? (
                 <Link href="/organizador/comecar" className={buttonVariants({ variant: "outline", className: "w-full" })}>Começar grátis</Link>
               ) : billingOn ? (
                 <Link href="/organizador/perfil" className={buttonVariants({ className: "w-full" })}>Assinar</Link>

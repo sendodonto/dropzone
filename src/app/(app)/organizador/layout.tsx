@@ -9,7 +9,7 @@ export default async function OrganizerLayout({ children }: LayoutProps<"/organi
         <MobileSubNav group={{ title: "Organizador", items: [
           { href: "/organizador", label: "Visão geral", icon: "gauge", exact: true },
           { href: "/organizador/campeonatos", label: "Campeonatos", icon: "list" },
-          { href: "/organizador/novo", label: "Criar", icon: "plus" },
+          ...(viewer.canOrganize ? [{ href: "/organizador/novo", label: "Criar", icon: "plus" } as const] : []),
           { href: "/organizador/denuncias", label: "Ocorrências", icon: "alert" },
           { href: "/organizador/perfil", label: "Perfil e plano", icon: "org" },
         ] }} />

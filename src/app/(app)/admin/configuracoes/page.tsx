@@ -6,6 +6,7 @@ import { SettingControl } from "./setting-control";
 export const metadata: Metadata = { title: "Configurações · Admin" };
 
 const meta: Record<string, { label: string; help: string; kind: "bool" | "number" | "text"; danger?: boolean }> = {
+  organizing_open: { label: "Qualquer usuário pode criar campeonatos", help: "Desligado: só organizadores oficiais e administradores criam e publicam campeonatos.", kind: "bool" },
   organizer_requires_approval: { label: "Aprovar novos organizadores manualmente", help: "Novos perfis de organizador ficam pendentes até aprovação.", kind: "bool" },
   payments_enabled: { label: "Pagamentos reais habilitados", help: "Só ative após validação jurídica e integração com provedor. Permite aprovar inscrições pagas.", kind: "bool", danger: true },
   subscriptions_billing_enabled: { label: "Cobrança de assinaturas (plano Pro)", help: "Depende da mesma integração financeira.", kind: "bool", danger: true },
