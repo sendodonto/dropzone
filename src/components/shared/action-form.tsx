@@ -1,9 +1,9 @@
 "use client";
-import { createContext, useActionState, useContext, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useActionState, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,6 +85,7 @@ type FieldProps = {
 
 export function Field({ name, label, hint, textarea, className, ...props }: FieldProps) {
   const errors = useContext(ErrorsCtx)[name];
+  const [shown, setShown] = useState(false);
   const common = {
     id: name, name, "aria-invalid": errors?.length ? true : undefined,
     "aria-describedby": errors?.length ? `${name}-error` : hint ? `${name}-hint` : undefined,
@@ -92,7 +93,15 @@ export function Field({ name, label, hint, textarea, className, ...props }: Fiel
   return (
     <div className={cn("grid gap-1.5", className)}>
       <Label htmlFor={name}>{label}{props.required && <span className="text-primary-text"> *</span>}</Label>
-      {textarea ? <Textarea {...common} {...props} /> : <Input {...common} {...props} />}
+      {textarea ? <Textarea {...common} {...props} /> : props.type === "password" ? (
+        <div className="relative">
+          <Input {...common} {...props} type={shown ? "text" : "password"} className="pr-12" />
+          <button type="button" onClick={() => setShown((s) => !s)} aria-label={shown ? "Ocultar senha" : "Mostrar senha"} aria-pressed={shown}
+            className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-xl text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-2 focus-visible:outline-ring">
+            {shown ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
+          </button>
+        </div>
+      ) : <Input {...common} {...props} />}
       {hint && !errors?.length && <p id={`${name}-hint`} className="text-xs text-muted-foreground">{hint}</p>}
       <FieldError name={name} />
     </div>
