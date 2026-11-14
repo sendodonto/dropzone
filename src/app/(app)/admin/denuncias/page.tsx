@@ -36,7 +36,7 @@ export default async function AdminReports({ searchParams }: PageProps<"/admin/d
   return (
     <div className="grid gap-4">
       <PageHeader title="Denúncias" description="Todas as decisões são registradas e o denunciante é notificado."
-        actions={<Link href={todas ? "?" : "?todas=1"} className="text-sm text-primary-text hover:underline">{todas ? "Só abertas" : "Ver todas"}</Link>} />
+        actions={<Link href={todas ? "?" : "?todas=1"} className="inline-flex min-h-10 items-center text-sm text-primary-text hover:underline">{todas ? "Só abertas" : "Ver todas"}</Link>} />
       {list.length ? (
         <ul className="grid gap-3">
           {list.map((r) => {

@@ -24,7 +24,7 @@ export default async function AdminTournaments({ searchParams }: PageProps<"/adm
       <PageHeader title="Campeonatos" description="Ocultar, destacar (destaque patrocinado) e analisar pedidos de inscrição paga." />
       <div className="flex flex-wrap items-center gap-3">
         <SearchBox placeholder="Buscar campeonato" defaultValue={q} />
-        <Link href={pagos ? "?" : "?pagos=1"} className="text-sm text-primary-text hover:underline">{pagos ? "Mostrar todos" : "Só pedidos de inscrição paga"}</Link>
+        <Link href={pagos ? "?" : "?pagos=1"} className="inline-flex min-h-10 items-center text-sm text-primary-text hover:underline">{pagos ? "Mostrar todos" : "Só pedidos de inscrição paga"}</Link>
       </div>
       {list.length ? (
         <ul className="divide-y rounded-3xl bg-card">

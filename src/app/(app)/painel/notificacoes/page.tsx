@@ -7,7 +7,7 @@ import { RealtimeRefresh } from "@/components/app/realtime-refresh";
 import { requireViewer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { markNotificationsRead } from "@/lib/actions/community";
-import { formatRelative } from "@/lib/format";
+import { formatRelative, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Notification } from "@/lib/types";
 
@@ -27,7 +27,7 @@ export default async function NotificationsPage() {
   return (
     <div className="grid gap-6">
       <RealtimeRefresh table="notifications" filter={`user_id=eq.${viewer.id}`} />
-      <PageHeader title="Notificações" description={unread ? `${unread} não lida(s)` : "Tudo em dia."}
+      <PageHeader title="Notificações" description={unread ? plural(unread, "não lida", "não lidas") : "Tudo em dia."}
         actions={unread > 0 && <ActionButton action={markNotificationsRead.bind(null, undefined)} variant="outline"><CheckCheck /> Marcar todas como lidas</ActionButton>} />
       {list.length ? (
         <ul className="divide-y rounded-3xl bg-card">

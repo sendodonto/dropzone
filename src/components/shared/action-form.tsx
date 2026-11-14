@@ -13,10 +13,13 @@ import type { ActionResult } from "@/lib/types";
 
 type FormAction = (state: ActionResult | null, fd: FormData) => Promise<ActionResult>;
 const ErrorsCtx = createContext<Record<string, string[] | undefined>>({});
+// Several copies of one form on a page (e.g. a room form per match) need distinct element ids.
+const IdPrefixCtx = createContext<string | undefined>(undefined);
+const useFieldId = (name: string) => { const p = useContext(IdPrefixCtx); return p ? `${p}-${name}` : name; };
 
 /** Form bound to a server action: toasts the result, shows field errors, follows redirectTo. */
 export function ActionForm({
-  action, children, className, resetOnSuccess, onSuccess, onError, id, preventEnterSubmit,
+  action, children, className, resetOnSuccess, onSuccess, onError, id, idPrefix, preventEnterSubmit,
 }: {
   action: FormAction;
   children: ReactNode;
@@ -25,6 +28,7 @@ export function ActionForm({
   onSuccess?: (r: ActionResult) => void;
   onError?: (fieldErrors: Record<string, string[] | undefined>) => void;
   id?: string;
+  idPrefix?: string;
   preventEnterSubmit?: boolean; // multi-step forms: Enter must not submit early
 }) {
   const [state, formAction] = useActionState(action, null);
@@ -47,12 +51,14 @@ export function ActionForm({
   }, [state]);
 
   return (
+    <IdPrefixCtx.Provider value={idPrefix}>
     <ErrorsCtx.Provider value={state && !state.ok ? state.fieldErrors ?? {} : {}}>
       <form ref={ref} id={id} action={formAction} className={cn("grid gap-4", className)} noValidate
         onKeyDown={preventEnterSubmit ? (e) => { if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") e.preventDefault(); } : undefined}>
         {children}
       </form>
     </ErrorsCtx.Provider>
+    </IdPrefixCtx.Provider>
   );
 }
 
@@ -71,8 +77,9 @@ export function SubmitButton({ children, className, variant, size, name, value }
 
 export function FieldError({ name }: { name: string }) {
   const errors = useContext(ErrorsCtx)[name];
+  const fid = useFieldId(name);
   if (!errors?.length) return null;
-  return <p id={`${name}-error`} className="text-xs text-destructive" role="alert">{errors[0]}</p>;
+  return <p id={`${fid}-error`} className="text-xs text-destructive" role="alert">{errors[0]}</p>;
 }
 
 type FieldProps = {
@@ -86,13 +93,14 @@ type FieldProps = {
 export function Field({ name, label, hint, textarea, className, ...props }: FieldProps) {
   const errors = useContext(ErrorsCtx)[name];
   const [shown, setShown] = useState(false);
+  const fid = useFieldId(name);
   const common = {
-    id: name, name, "aria-invalid": errors?.length ? true : undefined,
-    "aria-describedby": errors?.length ? `${name}-error` : hint ? `${name}-hint` : undefined,
+    id: fid, name, "aria-invalid": errors?.length ? true : undefined,
+    "aria-describedby": errors?.length ? `${fid}-error` : hint ? `${fid}-hint` : undefined,
   };
   return (
     <div className={cn("grid gap-1.5", className)}>
-      <Label htmlFor={name}>{label}{props.required && <span className="text-primary-text"> *</span>}</Label>
+      <Label htmlFor={fid}>{label}{props.required && <span className="text-primary-text"> *</span>}</Label>
       {textarea ? <Textarea {...common} {...props} /> : props.type === "password" ? (
         <div className="relative">
           <Input {...common} {...props} type={shown ? "text" : "password"} className="pr-12" />
@@ -102,7 +110,7 @@ export function Field({ name, label, hint, textarea, className, ...props }: Fiel
           </button>
         </div>
       ) : <Input {...common} {...props} />}
-      {hint && !errors?.length && <p id={`${name}-hint`} className="text-xs text-muted-foreground">{hint}</p>}
+      {hint && !errors?.length && <p id={`${fid}-hint`} className="text-xs text-muted-foreground">{hint}</p>}
       <FieldError name={name} />
     </div>
   );
@@ -113,11 +121,12 @@ export function SelectField({ name, label, options, defaultValue, hint, classNam
   name: string; label: string; options: readonly { value: string; label: string }[]; defaultValue?: string;
   hint?: string; className?: string; onChange?: (v: string) => void;
 }) {
+  const fid = useFieldId(name);
   return (
     <div className={cn("grid gap-1.5", className)}>
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={fid}>{label}</Label>
       <select
-        id={name}
+        id={fid}
         name={name}
         defaultValue={defaultValue}
         onChange={(e) => onChange?.(e.target.value)}

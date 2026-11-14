@@ -6,6 +6,7 @@ import {
   Settings, Shield, ShieldAlert, Trophy, User, Users, Wallet, CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ScrollStrip } from "@/components/shared/scroll-strip";
 
 const icons = {
   dashboard: LayoutDashboard, squads: Users, trophy: Trophy, bell: Bell, user: User, org: Building2, plus: Plus,
@@ -78,13 +79,16 @@ export function BottomNav({ items }: { items: NavGroup["items"] }) {
 export function MobileSubNav({ group }: { group: NavGroup }) {
   const pathname = usePathname();
   return (
-    <nav className="scrollbar-none scroll-fade -mx-4 mb-6 flex gap-1 overflow-x-auto border-b px-4 pb-3 lg:hidden" aria-label={group.title}>
-      {group.items.map((i) => (
-        <Link key={i.href} href={i.href}
-          className={cn("shrink-0 rounded-full px-3 py-1.5 text-sm", active(pathname, i.href, i.exact) ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
-          {i.label}
-        </Link>
-      ))}
-    </nav>
+    <ScrollStrip label={group.title} className="scrollbar-none scroll-fade -mx-4 mb-6 flex gap-1.5 overflow-x-auto border-b px-4 pb-3 lg:hidden">
+      {group.items.map((i) => {
+        const on = active(pathname, i.href, i.exact);
+        return (
+          <Link key={i.href} href={i.href} aria-current={on ? "page" : undefined}
+            className={cn("inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-sm", on ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+            {i.label}
+          </Link>
+        );
+      })}
+    </ScrollStrip>
   );
 }

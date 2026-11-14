@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Building2, CircleDollarSign, ClipboardList, Flag, Radio, ShieldAlert, Trophy, UserCheck, Users } from "lucide-react";
 import { PageHeader, Section, StatGroup, StatTile } from "@/components/shared/ui-bits";
 import { createClient } from "@/lib/supabase/server";
-import { formatMoney, formatRelative } from "@/lib/format";
+import { formatMoney, formatRelative, plural } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Administração" };
 
@@ -22,8 +22,8 @@ export default async function AdminDashboard() {
       {(st.pending_organizers > 0 || st.open_reports > 0 || st.paid_requests > 0) && (
         <div className="grid gap-2 sm:grid-cols-3">
           {st.pending_organizers > 0 && <Todo href="/admin/organizadores?status=pending" text={`${st.pending_organizers} organizador(es) aguardando aprovação`} />}
-          {st.open_reports > 0 && <Todo href="/admin/denuncias" text={`${st.open_reports} denúncia(s) em aberto`} />}
-          {st.paid_requests > 0 && <Todo href="/admin/campeonatos?pagos=1" text={`${st.paid_requests} pedido(s) de inscrição paga`} />}
+          {st.open_reports > 0 && <Todo href="/admin/denuncias" text={`${plural(st.open_reports, "denúncia", "denúncias")} em aberto`} />}
+          {st.paid_requests > 0 && <Todo href="/admin/campeonatos?pagos=1" text={`${plural(st.paid_requests, "pedido", "pedidos")} de inscrição paga`} />}
         </div>
       )}
       <StatGroup className="grid-cols-2 md:grid-cols-3">
@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
         <StatTile label="Volume registrado" value={formatMoney(st.payments_confirmed_cents)} icon={CircleDollarSign} hint="Pagamentos confirmados" />
         <StatTile label="Denúncias abertas" value={st.open_reports ?? 0} icon={ShieldAlert} />
       </StatGroup>
-      <Section title="Atividade recente" action={<Link href="/admin/logs" className="text-sm text-primary-text hover:underline">Todos os logs</Link>}>
+      <Section title="Atividade recente" action={<Link href="/admin/logs" className="inline-flex min-h-10 items-center text-sm text-primary-text hover:underline">Todos os logs</Link>}>
         <ul className="divide-y rounded-3xl bg-card text-sm">
           {((logs ?? []) as unknown as { id: number; action: string; entity_type: string; created_at: string; actor: { username: string } | null }[]).map((l) => (
             <li key={l.id} className="flex justify-between gap-3 p-3">

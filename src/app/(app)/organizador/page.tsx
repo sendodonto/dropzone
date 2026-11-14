@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { EmptyState, PageHeader, Section, StatGroup, StatTile, StatusBadge } from "@/components/shared/ui-bits";
 import { requireOrganizer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { auditLabel, formatDateTime, formatMoney, formatRelative } from "@/lib/format";
+import { auditLabel, formatDateTime, formatMoney, formatRelative, plural } from "@/lib/format";
 import type { Tournament } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Painel do organizador" };
@@ -42,10 +42,10 @@ export default async function OrganizerHome() {
 
       {(o.pending_registrations > 0 || o.open_disputes > 0 || o.open_reports > 0 || o.pending_results > 0) && (
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {o.pending_registrations > 0 && <Alert icon={ClipboardCheck} text={`${o.pending_registrations} inscrição(ões) aguardando aprovação`} />}
-          {o.pending_results > 0 && <Alert icon={Hourglass} text={`${o.pending_results} queda(s) sem resultado publicado`} />}
-          {o.open_disputes > 0 && <Alert icon={MessageSquareWarning} text={`${o.open_disputes} contestação(ões) aberta(s)`} href="/organizador/denuncias" />}
-          {o.open_reports > 0 && <Alert icon={AlertTriangle} text={`${o.open_reports} denúncia(s) em aberto`} href="/organizador/denuncias" />}
+          {o.pending_registrations > 0 && <Alert icon={ClipboardCheck} text={`${plural(o.pending_registrations, "inscrição aguarda", "inscrições aguardam")} aprovação`} />}
+          {o.pending_results > 0 && <Alert icon={Hourglass} text={`${plural(o.pending_results, "queda", "quedas")} sem resultado publicado`} />}
+          {o.open_disputes > 0 && <Alert icon={MessageSquareWarning} text={plural(o.open_disputes, "contestação aberta", "contestações abertas")} href="/organizador/denuncias" />}
+          {o.open_reports > 0 && <Alert icon={AlertTriangle} text={`${plural(o.open_reports, "denúncia", "denúncias")} em aberto`} href="/organizador/denuncias" />}
         </div>
       )}
 

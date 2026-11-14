@@ -101,6 +101,11 @@ export function ResultsEditor({ matchId, teams, existing, scoring, published }: 
           {pending ? <Loader2 className="animate-spin" /> : <Save />} {published ? "Salvar correção" : "Salvar rascunho"}
         </Button>
       </div>
+      {!published && (
+        <p className="text-xs text-muted-foreground">
+          {filled.length ? "Salve o rascunho. Depois, o botão Publicar resultado aparece aqui embaixo." : "Digite a colocação de cada equipe (1 = Booyah) e os abates para salvar o rascunho."}
+        </p>
+      )}
     </div>
   );
 }

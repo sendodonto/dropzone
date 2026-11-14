@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       )}
 
       <div className="grid items-start gap-10 xl:grid-cols-[1.4fr_1fr]">
-        <Section title="Próximos campeonatos" action={<Link href="/painel/campeonatos" className="text-sm text-primary-text hover:underline">Ver todos</Link>}>
+        <Section title="Próximos campeonatos" action={<Link href="/painel/campeonatos" className="inline-flex min-h-10 items-center text-sm text-primary-text hover:underline">Ver todos</Link>}>
           {active.length ? (
             <ul className="divide-y rounded-3xl bg-card">
               {active.map((r) => (
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
           )}
         </Section>
 
-        <Section title="Meus squads" action={<Link href="/painel/squads" className="text-sm text-primary-text hover:underline">Gerenciar</Link>}>
+        <Section title="Meus squads" action={<Link href="/painel/squads" className="inline-flex min-h-10 items-center text-sm text-primary-text hover:underline">Gerenciar</Link>}>
           {teams.length ? (
             <ul className="grid gap-2">
               {teams.map(({ team, role }) => (
@@ -96,7 +96,7 @@ export default async function DashboardPage() {
       {(notifications.length > 0 || earned.length > 0) && (
         <div className="grid items-start gap-10 xl:grid-cols-2">
           {notifications.length > 0 && (
-            <Section title="Atividade recente" action={<Link href="/painel/notificacoes" className="text-sm text-primary-text hover:underline">Ver tudo</Link>}>
+            <Section title="Atividade recente" action={<Link href="/painel/notificacoes" className="inline-flex min-h-10 items-center text-sm text-primary-text hover:underline">Ver tudo</Link>}>
               <ul className="divide-y rounded-3xl bg-card">
                 {notifications.map((n) => (
                   <li key={n.id} className="flex gap-3 p-3">

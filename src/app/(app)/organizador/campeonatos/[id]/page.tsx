@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Check, Eye, EyeOff, ExternalLink, Pin, Radio, Trash2, UserX, X } from "lucide-react";
+import { Check, ChevronDown, Eye, EyeOff, ExternalLink, Pin, Radio, Trash2, UserX, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Avatar, DemoBadge, EmptyState, PageHeader, RegistrationBadge, Section, StatGroup, StatTile, StatusBadge } from "@/components/shared/ui-bits";
 import { ActionButton } from "@/components/shared/action-button";
 import { ActionForm, Field, SubmitButton } from "@/components/shared/action-form";
 import { CopyButton } from "@/components/shared/client-bits";
+import { ScrollStrip } from "@/components/shared/scroll-strip";
 import { StatusActions } from "@/components/organizer/status-actions";
 import { RoomForm } from "@/components/organizer/room-form";
 import { ResultsEditor } from "@/components/organizer/results-editor";
@@ -57,6 +58,9 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
   };
   const teamsForMatch = confirmed.map((r) => ({ registration_id: r.id, name: r.team.name }));
   const publicUrl = `${site.url}/campeonatos/${t.slug}`;
+  // Without ?queda=, open the first match that still needs work so the form is visible on arrival.
+  const nextRoom = b.matches.find((m) => m.status !== "finished" && m.status !== "cancelled");
+  const nextResult = b.matches.find((m) => m.results_status !== "published");
 
   return (
     <div className="grid gap-6">
@@ -64,14 +68,14 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
         actions={<Link href={`/campeonatos/${t.slug}`} className={buttonVariants({ variant: "outline" })}><ExternalLink /> Ver página</Link>} />
       {t.hidden_by_admin && <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">Oculto pela moderação: {t.hidden_reason}</p>}
 
-      <nav className="scrollbar-none scroll-fade -mx-4 flex gap-1 overflow-x-auto border-b px-4 sm:mx-0 sm:px-0" aria-label="Seções de gestão">
+      <ScrollStrip label="Seções de gestão" className="scrollbar-none scroll-fade -mx-4 flex gap-1 overflow-x-auto border-b px-4 sm:mx-0 sm:px-0">
         {TABS.map(([k, label]) => (
           <Link key={k} href={`?tab=${k}`} scroll={false} aria-current={tab === k ? "page" : undefined}
             className={cn("-mb-px shrink-0 border-b-2 px-3 py-2.5 text-sm", tab === k ? "border-primary font-medium" : "border-transparent text-muted-foreground hover:text-foreground")}>
             {label}{k === "inscricoes" && pending.length > 0 && <span className="ml-1 rounded-full bg-warning px-1.5 text-[10px] font-bold text-background">{pending.length}</span>}
           </Link>
         ))}
-      </nav>
+      </ScrollStrip>
 
       {tab === "resumo" && (
         <div className="grid gap-8">
@@ -152,21 +156,24 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
               const room = b.rooms.find((r) => r.match_id === m.id);
               return (
                 <li key={m.id} className="rounded-3xl bg-card">
-                  <details open={m.status !== "finished" && (sp.queda ? sp.queda === String(m.number) : undefined)} className="group">
-                    <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 p-4">
+                  <details open={sp.queda ? sp.queda === String(m.number) : m.id === nextRoom?.id} className="group">
+                    <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 rounded-3xl p-4 hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring">
                       <span className="grid size-9 place-items-center rounded-lg bg-muted font-heading font-bold">{m.number}</span>
                       <span className="min-w-0 flex-1"><span className="font-medium">Queda {m.number} · {m.map}</span><span className="block text-xs text-muted-foreground">{formatDateTime(m.scheduled_at)}</span></span>
-                      <span className={cn("text-xs font-semibold", room?.published ? "text-primary-text" : "text-muted-foreground")}>
-                        {m.status === "finished" ? "Encerrada" : m.status === "live" ? "Em andamento" : room?.published ? "Sala publicada" : room ? "Sala salva (não publicada)" : "Sem sala"}
+                      <span className={cn("text-xs font-semibold", m.status !== "finished" && room?.published ? "text-primary-text" : m.status !== "finished" && !room ? "text-warning" : "text-muted-foreground")}>
+                        {m.status === "finished" ? "Encerrada" : m.status === "live" ? "Em andamento" : room?.published ? "Sala publicada" : room ? "Sala salva (não publicada)" : "Configurar sala"}
                       </span>
+                      <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
                     </summary>
                     <div className="grid gap-4 border-t p-4">
                       <RoomForm match={m} room={room} teams={teamsForMatch} targets={targets.filter((x) => x.match_id === m.id).map((x) => x.registration_id)} />
-                      <div className="flex flex-wrap gap-2 border-t pt-3">
-                        {room?.published && <ActionButton action={setRoomPublished.bind(null, m.id, false)} variant="ghost" size="sm"><EyeOff /> Ocultar sala</ActionButton>}
-                        {room && !room.published && <ActionButton action={setRoomPublished.bind(null, m.id, true)} variant="outline" size="sm"><Eye /> Publicar sala</ActionButton>}
-                        {m.status === "scheduled" && t.status === "live" && <ActionButton action={setMatchLive.bind(null, m.id)} variant="outline" size="sm"><Radio /> Marcar em andamento</ActionButton>}
-                      </div>
+                      {(room || (m.status === "scheduled" && t.status === "live")) && (
+                        <div className="flex flex-wrap gap-2 border-t pt-3">
+                          {room?.published && <ActionButton action={setRoomPublished.bind(null, m.id, false)} variant="ghost" size="sm"><EyeOff /> Ocultar sala</ActionButton>}
+                          {room && !room.published && <ActionButton action={setRoomPublished.bind(null, m.id, true)} variant="outline" size="sm"><Eye /> Publicar sala</ActionButton>}
+                          {m.status === "scheduled" && t.status === "live" && <ActionButton action={setMatchLive.bind(null, m.id)} variant="outline" size="sm"><Radio /> Marcar em andamento</ActionButton>}
+                        </div>
+                      )}
                     </div>
                   </details>
                 </li>
@@ -183,13 +190,14 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
         ) : (
           <div className="grid gap-4">
             {b.matches.map((m) => (
-              <details key={m.id} className="rounded-3xl bg-card" open={m.results_status !== "published" && (!sp.queda || sp.queda === String(m.number))}>
-                <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 p-4">
+              <details key={m.id} className="group rounded-3xl bg-card" open={sp.queda ? sp.queda === String(m.number) : m.id === nextResult?.id}>
+                <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 rounded-3xl p-4 hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring">
                   <span className="grid size-9 place-items-center rounded-lg bg-muted font-heading font-bold">{m.number}</span>
                   <span className="flex-1 font-medium">Queda {m.number} · {m.map}</span>
                   <span className={cn("text-xs font-semibold", m.results_status === "published" ? "text-success" : results.some((r) => r.match_id === m.id) ? "text-warning" : "text-muted-foreground")}>
                     {m.results_status === "published" ? "Publicado" : results.some((r) => r.match_id === m.id) ? "Rascunho" : "Sem resultado"}
                   </span>
+                  <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
                 </summary>
                 <div className="grid gap-3 border-t p-4">
                   <ResultsEditor matchId={m.id} teams={teamsForMatch} scoring={scoring} published={m.results_status === "published"}
@@ -252,7 +260,7 @@ function RegList({ regs, pending }: { regs: Awaited<ReturnType<typeof getTournam
         <li key={r.id} className="flex flex-wrap items-center gap-3 p-3">
           <Avatar src={r.team.logo_url} name={r.team.name} />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium">{r.team.name} <span className="text-xs text-muted-foreground">[{r.team.tag}]</span></p>
+            <p className="truncate font-medium">{r.team.name}</p>
             <p className="truncate text-xs text-muted-foreground">{r.players.map((p) => `${p.profile?.username}${p.is_reserve ? " (res.)" : ""}`).join(", ")}</p>
           </div>
           <div className="flex gap-1.5">

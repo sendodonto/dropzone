@@ -11,9 +11,9 @@ export function RoomForm({ match, room, teams, targets }: {
 }) {
   const [audience, setAudience] = useState<RoomAudience>(room?.audience ?? "confirmed");
   return (
-    <ActionForm action={saveRoom}>
+    <ActionForm action={saveRoom} idPrefix={`queda${match.number}`}>
       <input type="hidden" name="match_id" value={match.id} />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <SelectField name="map" label="Mapa" defaultValue={match.map} options={maps.map((m) => ({ value: m, label: m }))} />
         <Field name="scheduled_at" label="Horário da partida" type="datetime-local" defaultValue={isoToLocalInput(match.scheduled_at)} />
         <Field name="room_code" label="ID da sala" required maxLength={30} defaultValue={room?.room_code} autoComplete="off" />
