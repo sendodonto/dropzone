@@ -27,7 +27,14 @@ Premiações em dinheiro e inscrições pagas só podem ocorrer quando habilitad
 ## 5. Moderação
 A plataforma pode suspender contas, ocultar campeonatos e remover conteúdo que viole estes termos. As decisões são registradas.
 
-## 6. Contato
+## 6. Apostados
+- Apostados (desafios X1 a X4 com valor) são só para maiores de 18 anos. Cada jogador escalado confirma a própria idade; declarar idade falsa leva ao banimento.
+- A plataforma não guarda dinheiro: cada lado paga por Pix ao mediador, que confirma os pagamentos, libera a sala e paga o vencedor, descontada a taxa de mediação informada antes do aceite.
+- O resultado vale quando os dois capitães concordam. Em caso de divergência, o mediador decide com base em prints ou vídeo, e a decisão fica registrada.
+- Se o apostado for cancelado antes da partida, os valores pagos são devolvidos.
+- Trapaça, uso de jogador não escalado ou combinação de resultado anulam o apostado sem devolução para o lado infrator.
+
+## 7. Contato
 ${site.support.email || "Pelos canais de contato da plataforma."}`;
 
 export default function TermsPage() {

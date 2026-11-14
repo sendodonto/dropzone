@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 const items = [
   ["/admin", "Dashboard"], ["/admin/usuarios", "Usuários"], ["/admin/organizadores", "Organizadores"],
-  ["/admin/campeonatos", "Campeonatos"], ["/admin/equipes", "Equipes"], ["/admin/denuncias", "Denúncias"],
+  ["/admin/campeonatos", "Campeonatos"], ["/admin/apostados", "Apostados"], ["/admin/equipes", "Equipes"], ["/admin/denuncias", "Denúncias"],
   ["/admin/temporadas", "Temporadas"], ["/admin/planos", "Planos"], ["/admin/pagamentos", "Pagamentos"],
   ["/admin/configuracoes", "Configurações"], ["/admin/logs", "Logs"],
 ] as const;

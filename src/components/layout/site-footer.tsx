@@ -4,7 +4,7 @@ import { site } from "@/config/site";
 import { getOrganizingOpen } from "@/lib/auth";
 
 const cols = [
-  { title: "Plataforma", links: [["Campeonatos", "/campeonatos"], ["Rankings", "/rankings"], ["Equipes", "/equipes"], ["Como funciona", "/como-funciona"]] },
+  { title: "Plataforma", links: [["Campeonatos", "/campeonatos"], ["Apostados", "/apostados"], ["Rankings", "/rankings"], ["Equipes", "/equipes"], ["Como funciona", "/como-funciona"]] },
   { title: "Organizadores", links: [["Organizar campeonato", "/organizador/comecar"], ["Planos", "/planos"], ["Painel do organizador", "/organizador"]] },
   { title: "Legal", links: [["Termos de uso", "/termos"], ["Privacidade", "/privacidade"], ["Regras da comunidade", "/termos#conduta"]] },
 ] as const;

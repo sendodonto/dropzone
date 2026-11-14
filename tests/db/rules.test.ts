@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { as, createTestDb, failsAs, userId, type Db } from "./harness";
 import { computeStandings, DEFAULT_SCORING } from "@/lib/scoring";
 
@@ -83,6 +83,58 @@ describe("groups", () => {
     await db.query("delete from match_results where match_id in (select id from matches where tournament_id = $1)", [ids.open]);
     await db.query("update tournaments set status = 'registration_open' where id = $1", [ids.open]);
     await as(db, ids.org, (q) => q("select public.configure_groups($1, 1)", [ids.open]), { keep: true });
+  });
+});
+
+describe("apostados (wagers)", () => {
+  let mediator = "";
+  beforeAll(async () => {
+    mediator = await userId(db, "demo_p090");
+    await db.query("insert into user_roles(user_id, role) values ($1, 'admin') on conflict do nothing", [mediator]);
+  });
+  afterAll(async () => { await db.query("delete from user_roles where user_id = $1", [mediator]); });
+
+  it("X1 flow: adults only, no self-accept, room only for the sides after both payments, matching reports finish it", async () => {
+    const a = ids.p001, b = ids.stranger, outsider = ids.player;
+    const create = "select public.create_wager(1, 500, 1, 'Bermuda', null, null, $1::uuid[]) as id";
+    expect(await failsAs(db, a, create, [[a]])).toMatch(/maior de 18/);
+    expect(await failsAs(db, a, "select public.confirm_adult((current_date - interval '10 years')::date)")).toMatch(/maiores de 18/);
+    for (const u of [a, b]) await as(db, u, (q) => q("select public.confirm_adult(date '1999-05-05')"), { keep: true });
+
+    const wid = (await as(db, a, (q) => q<{ id: string }>(create, [[a]]), { keep: true })).rows[0].id;
+    expect(await failsAs(db, a, "select public.accept_wager($1, null, $2::uuid[])", [wid, [a]])).toMatch(/próprio/);
+    await as(db, b, (q) => q("select public.accept_wager($1, null, $2::uuid[])", [wid, [b]]), { keep: true });
+
+    // room cannot be released before both payments; players cannot confirm payments
+    expect(await failsAs(db, a, "select public.set_wager_room($1, '123', 'x')", [wid])).toMatch(/dois pagamentos/);
+    expect(await failsAs(db, a, "select public.admin_mark_wager_paid($1, 'a')", [wid])).toMatch(/administrador/);
+    await as(db, mediator, async (q) => { await q("select public.admin_mark_wager_paid($1, 'a')", [wid]); await q("select public.admin_mark_wager_paid($1, 'b')", [wid]); }, { keep: true });
+    await as(db, a, (q) => q("select public.set_wager_room($1, '7741', 'senha')", [wid]), { keep: true });
+
+    const seen = async (u: string | null) => (await as(db, u, (q) => q("select room_code from wager_rooms where wager_id = $1", [wid]))).rows.length;
+    expect(await seen(a)).toBe(1);
+    expect(await seen(b)).toBe(1);
+    expect(await seen(outsider)).toBe(0);
+    expect(await seen(null).catch(() => 0)).toBe(0);
+
+    await as(db, a, (q) => q("select public.report_wager($1, 'a')", [wid]), { keep: true });
+    await as(db, b, (q) => q("select public.report_wager($1, 'a')", [wid]), { keep: true });
+    const w = (await db.query<{ status: string; winner: string }>("select status, winner from wagers where id = $1", [wid])).rows[0];
+    expect(w).toEqual({ status: "finished", winner: "a" });
+  });
+
+  it("conflicting reports open a dispute; the kill switch blocks new wagers", async () => {
+    const a = ids.p001, b = ids.stranger;
+    const wid = (await as(db, a, (q) => q<{ id: string }>("select public.create_wager(1, 300, 3, 'Kalahari', 'só pistola', null, $1::uuid[]) as id", [[a]]), { keep: true })).rows[0].id;
+    await as(db, b, (q) => q("select public.accept_wager($1, null, $2::uuid[])", [wid, [b]]), { keep: true });
+    await as(db, mediator, async (q) => { await q("select public.admin_mark_wager_paid($1, 'a')", [wid]); await q("select public.admin_mark_wager_paid($1, 'b')", [wid]); await q("select public.set_wager_room($1, '1', null)", [wid]); }, { keep: true });
+    await as(db, a, (q) => q("select public.report_wager($1, 'a')", [wid]), { keep: true });
+    await as(db, b, (q) => q("select public.report_wager($1, 'b')", [wid]), { keep: true });
+    expect((await db.query<{ status: string }>("select status from wagers where id = $1", [wid])).rows[0].status).toBe("disputed");
+
+    await db.query("update platform_settings set value = 'false' where key = 'wagers_enabled'");
+    expect(await failsAs(db, a, "select public.create_wager(1, 300, 1, 'Bermuda', null, null, $1::uuid[])", [[a]])).toMatch(/pausados/);
+    await db.query("update platform_settings set value = 'true' where key = 'wagers_enabled'");
   });
 });
 

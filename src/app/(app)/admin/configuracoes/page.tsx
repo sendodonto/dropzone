@@ -6,6 +6,9 @@ import { SettingControl } from "./setting-control";
 export const metadata: Metadata = { title: "Configurações · Admin" };
 
 const meta: Record<string, { label: string; help: string; kind: "bool" | "number" | "text"; danger?: boolean }> = {
+  wagers_enabled: { label: "Apostados ativos", help: "Desligado: ninguém cria nem aceita apostados novos. Os em andamento continuam.", kind: "bool" },
+  wager_fee_percent: { label: "Taxa de mediação dos apostados (%)", help: "Descontada do pote. Vale para apostados criados depois da mudança.", kind: "number" },
+  wager_payment_instructions: { label: "Instruções de Pix dos apostados", help: "Aparece para os dois lados quando o apostado é aceito.", kind: "text" },
   organizing_open: { label: "Qualquer usuário pode criar campeonatos", help: "Desligado: só organizadores oficiais e administradores criam e publicam campeonatos.", kind: "bool" },
   organizer_requires_approval: { label: "Aprovar novos organizadores manualmente", help: "Novos perfis de organizador ficam pendentes até aprovação.", kind: "bool" },
   payments_enabled: { label: "Pagamentos reais habilitados", help: "Só ative após validação jurídica e integração com provedor. Permite aprovar inscrições pagas.", kind: "bool", danger: true },

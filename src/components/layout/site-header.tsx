@@ -9,6 +9,7 @@ import { NavLinks, MobileNav, UserMenu, NotificationBell } from "@/components/la
 export const publicNav = [
   { href: "/", label: "Início" },
   { href: "/campeonatos", label: "Campeonatos" },
+  { href: "/apostados", label: "Apostados" },
   { href: "/rankings", label: "Rankings" },
   { href: "/equipes", label: "Equipes" },
   { href: "/como-funciona", label: "Como funciona" },

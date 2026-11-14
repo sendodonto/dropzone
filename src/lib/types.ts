@@ -26,6 +26,8 @@ export interface Profile {
   status: "active" | "suspended" | "banned";
   status_reason: string | null;
   is_demo: boolean;
+  /** Set once the user confirmed being 18+ (apostados). The birth date itself is never stored. */
+  adult_confirmed_at: string | null;
   created_at: string;
 }
 
