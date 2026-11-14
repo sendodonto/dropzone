@@ -123,6 +123,13 @@ describe("apostados (wagers)", () => {
     expect(w).toEqual({ status: "finished", winner: "a" });
   });
 
+  it("visitors read public settings only", async () => {
+    const r = await as(db, null, (q) => q<{ key: string }>("select key from platform_settings"));
+    const keys = r.rows.map((x) => x.key);
+    expect(keys).toContain("wagers_enabled");
+    expect(keys).not.toContain("platform_fee_percent");
+  });
+
   it("internal helpers cannot be called through the API", async () => {
     const wid = (await db.query<{ id: string }>("select id from wagers limit 1")).rows[0].id;
     expect(await failsAs(db, ids.player, "select public.notify_wager($1, 'Falso', 'spam')", [wid])).toMatch(/permission denied/);

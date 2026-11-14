@@ -27,11 +27,14 @@ export async function getPlayerNames(ids: string[]): Promise<Map<string, string>
 
 export async function getWagerSettings() {
   const supabase = await createClient();
-  const { data } = await supabase.from("platform_settings").select("key, value")
-    .in("key", ["wagers_enabled", "wager_fee_percent", "wager_payment_instructions"]);
+  // Visitors (anon) cannot read platform_settings; the on/off flag comes from an RPC they may call.
+  const [{ data }, { data: enabled }] = await Promise.all([
+    supabase.from("platform_settings").select("key, value").in("key", ["wager_fee_percent", "wager_payment_instructions"]),
+    supabase.rpc("wagers_enabled"),
+  ]);
   const get = (k: string) => (data ?? []).find((s) => s.key === k)?.value;
   return {
-    enabled: get("wagers_enabled") === true,
+    enabled: enabled === true,
     feePercent: Number(get("wager_fee_percent") ?? 10),
     paymentInstructions: typeof get("wager_payment_instructions") === "string" ? (get("wager_payment_instructions") as string) : "",
   };
