@@ -108,6 +108,9 @@ export interface Match {
   id: string;
   tournament_id: string;
   number: number;
+  /** Queda number shown to people; with groups several matches share a round. */
+  round: number | null;
+  group_label: string | null;
   map: string;
   scheduled_at: string | null;
   status: MatchStatus;

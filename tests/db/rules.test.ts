@@ -51,6 +51,41 @@ describe("entry fee paid to the organizer (external)", () => {
   });
 });
 
+describe("groups", () => {
+  it("draw splits confirmed teams evenly, one match per round and group; results and rooms stay inside the group", async () => {
+    await as(db, ids.org, async (q) => {
+      await q("select public.configure_groups($1, 2)", [ids.open]);
+      const sizes = await q<{ group_label: string; n: number }>("select group_label, count(*)::int n from tournament_registrations where tournament_id = $1 and status = 'confirmed' group by 1 order by 1", [ids.open]);
+      expect(sizes.rows.map((r) => r.group_label)).toEqual(["A", "B"]);
+      expect(Math.abs(sizes.rows[0].n - sizes.rows[1].n)).toBeLessThanOrEqual(1);
+      const t = await q<{ matches_count: number }>("select matches_count from tournaments where id = $1", [ids.open]);
+      const m = await q<{ n: number; rounds: number }>("select count(*)::int n, count(distinct round)::int rounds from matches where tournament_id = $1", [ids.open]);
+      expect(m.rows[0]).toEqual({ n: t.rows[0].matches_count * 2, rounds: t.rows[0].matches_count });
+
+    }, { keep: true });
+    await db.query("update tournaments set status = 'live' where id = $1", [ids.open]);
+    const matchA = (await db.query<{ id: string }>("select id from matches where tournament_id = $1 and group_label = 'A' and round = 1", [ids.open])).rows[0].id;
+    const regB = (await db.query<{ id: string }>("select id from tournament_registrations where tournament_id = $1 and group_label = 'B' limit 1", [ids.open])).rows[0].id;
+    const regA = (await db.query<{ id: string }>("select id from tournament_registrations where tournament_id = $1 and group_label = 'A' limit 1", [ids.open])).rows[0].id;
+    expect(await failsAs(db, ids.org, "select public.save_match_results($1, $2::jsonb)", [matchA, JSON.stringify([{ registration_id: regB, placement: 1, kills: 0 }])]))
+      .toMatch(/outro grupo/);
+    await as(db, ids.org, (q) => q("select public.save_match_results($1, $2::jsonb)", [matchA, JSON.stringify([{ registration_id: regA, placement: 1, kills: 3 }])]));
+
+    // rooms: published group-A room is visible to a group-A captain, not to a group-B captain
+    await db.query("insert into match_rooms(match_id, room_code, published) values ($1, '999', true)", [matchA]);
+    const captainOf = async (reg: string) => (await db.query<{ captain_id: string }>("select t.captain_id from tournament_registrations r join teams t on t.id = r.team_id where r.id = $1", [reg])).rows[0].captain_id;
+    const seeA = await as(db, await captainOf(regA), (q) => q<{ v: boolean }>("select public.can_view_room($1) v", [matchA]));
+    const seeB = await as(db, await captainOf(regB), (q) => q<{ v: boolean }>("select public.can_view_room($1) v", [matchA]));
+    expect(seeA.rows[0].v).toBe(true);
+    expect(seeB.rows[0].v).toBe(false);
+
+    // restore the open tournament for the suites below
+    await db.query("delete from match_results where match_id in (select id from matches where tournament_id = $1)", [ids.open]);
+    await db.query("update tournaments set status = 'registration_open' where id = $1", [ids.open]);
+    await as(db, ids.org, (q) => q("select public.configure_groups($1, 1)", [ids.open]), { keep: true });
+  });
+});
+
 describe("organizing gate (organizing_open = false)", () => {
   it("only official organizers and admins can create organizers or tournaments", async () => {
     await db.query("update platform_settings set value = 'false' where key = 'organizing_open'");

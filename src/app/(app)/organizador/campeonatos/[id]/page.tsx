@@ -5,7 +5,7 @@ import { Check, ChevronDown, Eye, EyeOff, ExternalLink, Pin, Radio, Trash2, User
 import { buttonVariants } from "@/components/ui/button";
 import { Avatar, DemoBadge, EmptyState, PageHeader, RegistrationBadge, Section, StatGroup, StatTile, StatusBadge } from "@/components/shared/ui-bits";
 import { ActionButton } from "@/components/shared/action-button";
-import { ActionForm, Field, SubmitButton } from "@/components/shared/action-form";
+import { ActionForm, Field, SelectField, SubmitButton } from "@/components/shared/action-form";
 import { CopyButton } from "@/components/shared/client-bits";
 import { ScrollStrip } from "@/components/shared/scroll-strip";
 import { StatusActions } from "@/components/organizer/status-actions";
@@ -19,8 +19,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getMatchResults, getTournamentBundle } from "@/lib/tournament";
 import { getStandings } from "@/lib/queries";
 import { deleteAnnouncement, postAnnouncement, reviewRegistration } from "@/lib/actions/tournaments";
-import { publishResults, setMatchLive, setRoomPublished } from "@/lib/actions/matches";
-import { auditLabel, formatDateTime, formatRelative, isoToLocalInput } from "@/lib/format";
+import { configureGroups, publishResults, setMatchLive, setRoomPublished } from "@/lib/actions/matches";
+import { auditLabel, formatDateTime, formatRelative, isoToLocalInput, matchLabel } from "@/lib/format";
 import { DEFAULT_SCORING } from "@/lib/scoring";
 import { site } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -56,7 +56,11 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
     killPoints: Number(b.scoring?.kill_points ?? 1), maxBonus: b.scoring?.max_bonus ?? 0,
     tiebreakers: b.scoring?.tiebreakers ?? DEFAULT_SCORING.tiebreakers,
   };
-  const teamsForMatch = confirmed.map((r) => ({ registration_id: r.id, name: r.team.name }));
+  // A group match only involves its group's teams (rooms, results).
+  const teamsForMatch = (m: { group_label: string | null }) =>
+    confirmed.filter((r) => !m.group_label || r.group_label === m.group_label).map((r) => ({ registration_id: r.id, name: r.team.name }));
+  const groupLabels = [...new Set(b.matches.map((m) => m.group_label).filter(Boolean))] as string[];
+  const hasResults = results.length > 0;
   const publicUrl = `${site.url}/campeonatos/${t.slug}`;
   // Without ?queda=, open the first match that still needs work so the form is visible on arrival.
   const nextRoom = b.matches.find((m) => m.status !== "finished" && m.status !== "cancelled");
@@ -149,6 +153,40 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
         </div>
       )}
 
+      {tab === "partidas" && b.matches.length > 0 && t.status !== "finished" && t.status !== "cancelled" && (
+        <section className="grid gap-3 rounded-3xl bg-card p-4" aria-labelledby="grupos">
+          <div>
+            <h2 id="grupos" className="text-lg">Grupos</h2>
+            <p className="text-sm text-muted-foreground">
+              Uma sala comporta cerca de 12 squads. Com mais equipes, divida em grupos: cada queda passa a existir uma vez por grupo, a sala de cada grupo só aparece para ele e a tabela soma tudo.
+              {groupLabels.length > 0 ? ` Agora: ${groupLabels.length} grupos.` : ""}
+            </p>
+          </div>
+          {hasResults ? (
+            <p className="text-sm text-muted-foreground">Já há resultados lançados: os grupos não podem mais ser refeitos.</p>
+          ) : (
+            <ActionForm key={groupLabels.length} action={configureGroups.bind(null, t.id)} className="flex flex-wrap items-end gap-3">
+              <SelectField name="groups" label="Quantidade de grupos" defaultValue={String(Math.max(groupLabels.length, 1))} className="w-48"
+                options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: n === 1 ? "Sem grupos" : `${n} grupos` }))} />
+              <SubmitButton variant="outline">Sortear com as equipes confirmadas</SubmitButton>
+            </ActionForm>
+          )}
+          {groupLabels.length > 0 && (
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {groupLabels.map((g) => (
+                <li key={g} className="rounded-2xl bg-background p-3 text-sm">
+                  <p className="font-semibold">Grupo {g}</p>
+                  <p className="mt-1 text-muted-foreground">{confirmed.filter((r) => r.group_label === g).map((r) => r.team.name).join(", ") || "Nenhuma equipe"}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          {groupLabels.length > 0 && confirmed.some((r) => !r.group_label) && (
+            <p className="text-sm text-warning">Há equipes confirmadas depois do sorteio sem grupo. Sorteie de novo para incluí-las.</p>
+          )}
+        </section>
+      )}
+
       {tab === "partidas" && (
         b.matches.length ? (
           <ul className="grid gap-4">
@@ -158,15 +196,15 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
                 <li key={m.id} className="rounded-3xl bg-card">
                   <details open={sp.queda ? sp.queda === String(m.number) : m.id === nextRoom?.id} className="group">
                     <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 rounded-3xl p-4 hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring">
-                      <span className="grid size-9 place-items-center rounded-lg bg-muted font-heading font-bold">{m.number}</span>
-                      <span className="min-w-0 flex-1"><span className="font-medium">Queda {m.number} · {m.map}</span><span className="block text-xs text-muted-foreground">{formatDateTime(m.scheduled_at)}</span></span>
+                      <span className="grid size-9 place-items-center rounded-lg bg-muted font-heading font-bold">{m.round ?? m.number}</span>
+                      <span className="min-w-0 flex-1"><span className="font-medium">{matchLabel(m)}</span><span className="block text-xs text-muted-foreground">{formatDateTime(m.scheduled_at)}</span></span>
                       <span className={cn("text-xs font-semibold", m.status !== "finished" && room?.published ? "text-primary-text" : m.status !== "finished" && !room ? "text-warning" : "text-muted-foreground")}>
                         {m.status === "finished" ? "Encerrada" : m.status === "live" ? "Em andamento" : room?.published ? "Sala publicada" : room ? "Sala salva (não publicada)" : "Configurar sala"}
                       </span>
                       <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
                     </summary>
                     <div className="grid gap-4 border-t p-4">
-                      <RoomForm match={m} room={room} teams={teamsForMatch} targets={targets.filter((x) => x.match_id === m.id).map((x) => x.registration_id)} />
+                      <RoomForm match={m} room={room} teams={teamsForMatch(m)} targets={targets.filter((x) => x.match_id === m.id).map((x) => x.registration_id)} />
                       {(room || (m.status === "scheduled" && t.status === "live")) && (
                         <div className="flex flex-wrap gap-2 border-t pt-3">
                           {room?.published && <ActionButton action={setRoomPublished.bind(null, m.id, false)} variant="ghost" size="sm"><EyeOff /> Ocultar sala</ActionButton>}
@@ -192,15 +230,15 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
             {b.matches.map((m) => (
               <details key={m.id} className="group rounded-3xl bg-card" open={sp.queda ? sp.queda === String(m.number) : m.id === nextResult?.id}>
                 <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 rounded-3xl p-4 hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring">
-                  <span className="grid size-9 place-items-center rounded-lg bg-muted font-heading font-bold">{m.number}</span>
-                  <span className="flex-1 font-medium">Queda {m.number} · {m.map}</span>
+                  <span className="grid size-9 place-items-center rounded-lg bg-muted font-heading font-bold">{m.round ?? m.number}</span>
+                  <span className="flex-1 font-medium">{matchLabel(m)}</span>
                   <span className={cn("text-xs font-semibold", m.results_status === "published" ? "text-success" : results.some((r) => r.match_id === m.id) ? "text-warning" : "text-muted-foreground")}>
                     {m.results_status === "published" ? "Publicado" : results.some((r) => r.match_id === m.id) ? "Rascunho" : "Sem resultado"}
                   </span>
                   <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
                 </summary>
                 <div className="grid gap-3 border-t p-4">
-                  <ResultsEditor matchId={m.id} teams={teamsForMatch} scoring={scoring} published={m.results_status === "published"}
+                  <ResultsEditor matchId={m.id} teams={teamsForMatch(m)} scoring={scoring} published={m.results_status === "published"}
                     existing={results.filter((r) => r.match_id === m.id)} />
                   {m.results_status !== "published" && results.some((r) => r.match_id === m.id) && (
                     <ActionButton action={publishResults.bind(null, m.id)} className="justify-self-start"
@@ -260,7 +298,7 @@ function RegList({ regs, pending }: { regs: Awaited<ReturnType<typeof getTournam
         <li key={r.id} className="flex flex-wrap items-center gap-3 p-3">
           <Avatar src={r.team.logo_url} name={r.team.name} />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium">{r.team.name}</p>
+            <p className="truncate font-medium">{r.team.name}{r.group_label && <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">Grupo {r.group_label}</span>}</p>
             <p className="truncate text-xs text-muted-foreground">{r.players.map((p) => `${p.profile?.username}${p.is_reserve ? " (res.)" : ""}`).join(", ")}</p>
           </div>
           <div className="flex gap-1.5">

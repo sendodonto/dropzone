@@ -35,6 +35,14 @@ export async function saveRoom(_: unknown, fd: FormData): Promise<ActionResult> 
   return { ok: true, message: "Sala salva (ainda não publicada)." };
 }
 
+/** Splits confirmed teams into groups (1 = no groups) and rebuilds the match list. */
+export async function configureGroups(tournamentId: string, _: unknown, fd: FormData): Promise<ActionResult> {
+  const groups = z.coerce.number().int().min(1).max(8).safeParse(fd.get("groups"));
+  if (!groups.success) return { ok: false, message: "Escolha de 1 a 8 grupos." };
+  return callRpc("configure_groups", { p_tournament: tournamentId, p_groups: groups.data },
+    { success: groups.data > 1 ? `Equipes sorteadas em ${groups.data} grupos.` : "Grupos removidos." });
+}
+
 export async function setRoomPublished(matchId: string, publish: boolean) {
   return callRpc("publish_match_room", { p_match: matchId, p_publish: publish },
     { success: publish ? "Sala publicada." : "Sala ocultada." });

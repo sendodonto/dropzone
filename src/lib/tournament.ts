@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Match, MatchRoom, Organizer, RegistrationStatus, Scoring, Team, Tournament } from "@/lib/types";
 
 export type RegistrationRow = {
-  id: string; status: RegistrationStatus; status_reason: string | null; final_rank: number | null; created_at: string;
+  id: string; status: RegistrationStatus; status_reason: string | null; final_rank: number | null; created_at: string; group_label: string | null;
   team: Pick<Team, "id" | "name" | "tag" | "slug" | "logo_url" | "captain_id">;
   players: { user_id: string; is_reserve: boolean; profile: { username: string; display_name: string; avatar_url: string | null } | null }[];
 };
@@ -30,7 +30,7 @@ export async function getTournamentBundle(t: Tournament) {
     supabase.from("announcements").select("*, author:profiles(username, display_name)").eq("tournament_id", t.id)
       .order("pinned", { ascending: false }).order("created_at", { ascending: false }),
     supabase.from("tournament_registrations")
-      .select("id, status, status_reason, final_rank, created_at, team:teams(id, name, tag, slug, logo_url, captain_id), players:registration_players(user_id, is_reserve, profile:profiles(username, display_name, avatar_url))")
+      .select("id, status, status_reason, final_rank, created_at, group_label, team:teams(id, name, tag, slug, logo_url, captain_id), players:registration_players(user_id, is_reserve, profile:profiles(username, display_name, avatar_url))")
       .eq("tournament_id", t.id).order("created_at"),
     supabase.from("matches").select("*").eq("tournament_id", t.id).order("number"),
     supabase.from("match_rooms").select("*, match:matches!inner(tournament_id)").eq("match.tournament_id", t.id),

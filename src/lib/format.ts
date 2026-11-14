@@ -103,7 +103,7 @@ export function plural(n: number, one: string, many: string) {
 /** Plain-language names for audit_logs.action codes shown to organizers. Unknown codes fall back to the raw code. */
 const auditLabels: Record<string, string> = {
   "tournament.created": "Campeonato criado", "tournament.published": "Campeonato publicado", "tournament.status": "Status alterado",
-  "tournament.rescheduled": "Data alterada", "tournament.finalized": "Campeonato finalizado", "tournament.moderated": "Moderação aplicada",
+  "tournament.rescheduled": "Data alterada", "tournament.finalized": "Campeonato finalizado", "tournament.groups": "Grupos sorteados", "registration.group": "Equipe trocada de grupo", "tournament.moderated": "Moderação aplicada",
   "tournament.paid_requested": "Inscrição paga solicitada", "tournament.paid_review": "Inscrição paga revisada",
   "registration.created": "Nova inscrição", "registration.withdrawn": "Inscrição retirada", "registration.confirmed": "Inscrição aprovada",
   "registration.rejected": "Inscrição recusada", "registration.removed": "Equipe removida", "registration.pending": "Inscrição em análise",
@@ -113,4 +113,8 @@ const auditLabels: Record<string, string> = {
   "season.champions": "Campeões da temporada", "plan.updated": "Plano atualizado", "setting.updated": "Configuração alterada",
   "role.granted": "Permissão concedida", "role.revoked": "Permissão removida", "role.bootstrap_admin": "Primeiro admin definido",
 };
+/** "Queda 2 · Grupo B · Kalahari" — rounds and groups when the tournament uses them. */
+export const matchLabel = (m: { number: number; round?: number | null; group_label?: string | null; map?: string }) =>
+  [`Queda ${m.round ?? m.number}`, m.group_label && `Grupo ${m.group_label}`, m.map].filter(Boolean).join(" · ");
+
 export const auditLabel = (action: string) => auditLabels[action] ?? action;

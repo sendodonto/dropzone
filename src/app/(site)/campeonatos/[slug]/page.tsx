@@ -18,7 +18,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getMatchResults, getTournamentBundle, getTournamentBySlug, type RegistrationRow } from "@/lib/tournament";
 import { getStandings } from "@/lib/queries";
 import { withdrawRegistration } from "@/lib/actions/tournaments";
-import { entryLabel, formatDateTime, formatMoney, formatPoints, formatTime, modeLabel, platformLabel } from "@/lib/format";
+import { entryLabel, formatDateTime, formatMoney, formatPoints, formatTime, modeLabel, platformLabel, matchLabel } from "@/lib/format";
 import { TIEBREAKER_LABEL } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
 import type { Match, MatchRoom, Tiebreaker } from "@/lib/types";
@@ -197,7 +197,7 @@ export default async function TournamentPage({ params, searchParams }: PageProps
             <p className="text-sm text-muted-foreground">
               {t.status === "finished" ? "Classificação final." : "Atualizada automaticamente a cada resultado publicado."} Desempate: {(b.scoring?.tiebreakers ?? []).map((x) => TIEBREAKER_LABEL[x as Tiebreaker]).join(" → ")}.
             </p>
-            <StandingsTable rows={standings} totalMatches={b.matches.filter((m) => m.status !== "cancelled").length} highlight={new Set(mine.map((m) => m.id))} />
+            <StandingsTable rows={standings} totalMatches={new Set(b.matches.filter((m) => m.status !== "cancelled").map((m) => m.round ?? m.number)).size} highlight={new Set(mine.map((m) => m.id))} />
           </div>
         )}
         {tab === "regulamento" && <RulesTab rules={b.rules} scoring={b.scoring} disputeWindow={t.dispute_window_minutes} />}
@@ -245,7 +245,7 @@ function Overview({ t, b, confirmed }: { t: NonNullable<Awaited<ReturnType<typeo
             {t.registration_opens_at && <TimelineItem when={t.registration_opens_at} label="Abertura das inscrições" />}
             {t.registration_closes_at && <TimelineItem when={t.registration_closes_at} label="Encerramento das inscrições" />}
             <TimelineItem when={t.starts_at} label="Início do campeonato" highlight />
-            {b.matches.map((m) => <TimelineItem key={m.id} when={m.scheduled_at} label={`Queda ${m.number} · ${m.map}`} />)}
+            {b.matches.map((m) => <TimelineItem key={m.id} when={m.scheduled_at} label={matchLabel(m)} />)}
           </ol>
         </Section>
       </div>
@@ -354,9 +354,9 @@ function MatchesTab({ matches, rooms, roomStatus, results, regs, myReg, canManag
         return (
           <li key={m.id} className="overflow-hidden rounded-3xl bg-card">
             <div className="flex flex-wrap items-center gap-3 border-b p-4">
-              <span className="grid size-10 place-items-center rounded-lg bg-muted font-heading text-lg font-bold">{m.number}</span>
+              <span className="grid size-10 place-items-center rounded-lg bg-muted font-heading text-lg font-bold">{m.round ?? m.number}</span>
               <div className="min-w-0 flex-1">
-                <p className="font-medium">Queda {m.number} · {m.map}</p>
+                <p className="font-medium">{matchLabel(m)}</p>
                 <p className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="size-3" aria-hidden />{formatDateTime(m.scheduled_at)}</p>
               </div>
               <span className={cn("text-xs font-semibold",
