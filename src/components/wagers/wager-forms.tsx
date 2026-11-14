@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ActionForm, Field, SelectField, SubmitButton } from "@/components/shared/action-form";
 import { acceptWager, confirmAdult, createWager } from "@/lib/actions/wagers";
 import { maps } from "@/config/site";
+import { gelOptions, toggleRules, weaponOptions } from "@/lib/wager-rules";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -83,8 +84,21 @@ export function CreateWagerForm({ teams, meId, feePercent }: { teams: CaptainTea
       <Field name="stake" label="Valor por jogador (R$)" type="number" min={1} max={500} step="0.5" required
         value={stake} onChange={(e) => setStake(Number(e.currentTarget.value) || 0)}
         hint={`Cada lado paga ${formatMoney(stake * 100 * size)}. Vencedor recebe ${formatMoney(prize)} (taxa de mediação ${feePercent}%).`} />
-      <Field name="rules" label="Regras combinadas (opcional)" textarea rows={3} maxLength={1000}
-        placeholder="ex.: só pistola, sem gelo, sem emulador, personagem livre" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <SelectField name="weapon" label="Armas" defaultValue="livre" options={weaponOptions.map((o) => ({ value: o.value, label: o.label }))} />
+        <SelectField name="gel" label="Gelo (parede de gel)" defaultValue="normal" options={gelOptions.map((o) => ({ value: o.value, label: o.label }))} />
+      </div>
+      <fieldset className="grid gap-2">
+        <legend className="mb-1 text-sm font-medium">Regras da sala</legend>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {toggleRules.map((r) => (
+            <label key={r.value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border px-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+              <input type="checkbox" name="toggles[]" value={r.value} className="size-4 accent-[var(--primary)]" />
+              {r.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <MeAsPlayer size={size} meId={meId} />
       <RosterFields size={size} teams={teams} />
       <SubmitButton size="lg" className="justify-self-start">Criar apostado</SubmitButton>

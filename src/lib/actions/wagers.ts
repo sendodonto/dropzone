@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { callRpc, invalid } from "@/lib/actions/helpers";
 import type { ActionResult } from "@/lib/types";
+import { composeRules } from "@/lib/wager-rules";
 
 const roster = (fd: FormData) => ({
   team: String(fd.get("team_id") || "") || null,
@@ -19,7 +20,8 @@ const createSchema = z.object({
   stake: z.coerce.number({ error: "Informe o valor." }).min(1, "Mínimo R$ 1,00 por jogador.").max(500, "Máximo R$ 500,00 por jogador."),
   rounds: z.coerce.number().refine((n) => [1, 3, 5].includes(n), "Formato inválido."),
   map: z.string().trim().min(2).max(30),
-  rules: z.string().trim().max(1000).optional().default(""),
+  weapon: z.string().optional().default("livre"),
+  gel: z.string().optional().default("normal"),
 });
 
 export async function createWager(_: unknown, fd: FormData): Promise<ActionResult> {
@@ -29,7 +31,7 @@ export async function createWager(_: unknown, fd: FormData): Promise<ActionResul
   const r = roster(fd);
   const res = await callRpc("create_wager", {
     p_team_size: d.team_size, p_stake_cents: Math.round(d.stake * 100), p_rounds: d.rounds, p_map: d.map,
-    p_rules: d.rules, p_team: d.team_size > 1 ? r.team : null, p_players: r.players,
+    p_rules: composeRules(d.weapon, d.gel, fd.getAll("toggles[]").map(String)), p_team: d.team_size > 1 ? r.team : null, p_players: r.players,
   }, { success: "Apostado criado! Agora é só esperar alguém aceitar." });
   return res.ok ? { ...res, redirectTo: `/apostados/${res.data}` } : res;
 }

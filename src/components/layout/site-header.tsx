@@ -46,7 +46,8 @@ export async function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           {menuUser ? (
             <>
-              <Link href="/painel" className={buttonVariants({ size: "sm" })}>Meu painel</Link>
+              {/* Phones reach the panel from the ☰ sheet and the avatar menu; the pill would crowd the bar. */}
+              <Link href="/painel" className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex")}>Meu painel</Link>
               <NotificationBell unread={unread} />
               <UserMenu user={menuUser} />
             </>
