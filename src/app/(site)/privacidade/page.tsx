@@ -21,7 +21,7 @@ Username, nome de exibição, avatar, squads e resultados de campeonatos. Seu em
 A plataforma não armazena dados de cartão. Quando pagamentos forem habilitados, serão processados por provedor certificado.
 
 ## Seus direitos
-Você pode solicitar acesso, correção ou exclusão dos seus dados pelo email ${site.support.email}.`;
+Você pode solicitar acesso, correção ou exclusão dos seus dados ${site.support.email ? `pelo email ${site.support.email}` : "pelos canais de contato da plataforma"}.`;
 
 export default function PrivacyPage() {
   return (

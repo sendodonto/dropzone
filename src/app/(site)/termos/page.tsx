@@ -28,7 +28,7 @@ Premiações em dinheiro e inscrições pagas só podem ocorrer quando habilitad
 A plataforma pode suspender contas, ocultar campeonatos e remover conteúdo que viole estes termos. As decisões são registradas.
 
 ## 6. Contato
-${site.support.email}`;
+${site.support.email || "Pelos canais de contato da plataforma."}`;
 
 export default function TermsPage() {
   return (

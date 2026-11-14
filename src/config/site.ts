@@ -9,7 +9,8 @@ export const site = {
   game: "Free Fire",
   locale: "pt-BR",
   timezone: "America/Sao_Paulo",
-  support: { email: "contato@exemplo.com", discord: null as string | null, instagram: null as string | null },
+  // Contact shown in Termos/Privacidade (LGPD requests). Set NEXT_PUBLIC_SUPPORT_EMAIL on the host.
+  support: { email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "", discord: null as string | null, instagram: null as string | null },
   disclaimer:
     "Plataforma independente, sem vínculo com a Garena. Free Fire é marca registrada de seus respectivos donos.",
 } as const;
