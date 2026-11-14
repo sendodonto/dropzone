@@ -1,26 +1,195 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-display);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-text: var(--primary-text);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* DROPZONE: friendly and calm. White ground, soft gray surfaces, generous rounding,
+   black type, and blue as the one brand colour: it fills the hero and banners and marks actions. */
+:root {
+  --radius: 1rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.16 0 0);
+  --card: oklch(0.967 0 0);
+  --card-foreground: oklch(0.16 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0 0);
+  --primary: oklch(0.52 0.2 262);
+  --primary-foreground: oklch(1 0 0);
+  --primary-text: oklch(0.52 0.2 262);
+  --secondary: oklch(0.935 0 0);
+  --secondary-foreground: oklch(0.16 0 0);
+  --muted: oklch(0.935 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.93 0 0);
+  --accent-foreground: oklch(0.16 0 0);
+  --destructive: oklch(0.55 0.21 25);
+  --success: oklch(0.52 0.14 150);
+  --warning: oklch(0.53 0.12 65);
+  --info: oklch(0.4 0 0);
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0 0 0 / 14%);
+  --ring: oklch(0.52 0.2 262 / 45%);
+  --chart-1: oklch(0.52 0.2 262);
+  --chart-2: oklch(0.16 0 0);
+  --chart-3: oklch(0.72 0.12 262);
+  --chart-4: oklch(0.6 0 0);
+  --chart-5: oklch(0.85 0 0);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.3 0 0);
+  --sidebar-primary: oklch(0.52 0.2 262);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.02 262);
+  --sidebar-accent-foreground: oklch(0.16 0 0);
+  --sidebar-border: oklch(0 0 0 / 8%);
+  --sidebar-ring: oklch(0.52 0.2 262 / 45%);
+}
+
+/* Inverted regions (blue field, black footer): text and lines flip to white. */
+.on-color {
+  --foreground: oklch(1 0 0);
+  --muted: oklch(1 0 0 / 16%);
+  --destructive: oklch(1 0 0);
+  --success: oklch(1 0 0);
+  --warning: oklch(1 0 0);
+  --muted-foreground: oklch(1 0 0 / 90%);
+  --border: oklch(1 0 0 / 22%);
+  --input: oklch(1 0 0 / 30%);
+  --primary-text: oklch(1 0 0);
+  --ring: oklch(1 0 0 / 60%);
+  color: var(--foreground);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
+  html {
+    @apply font-sans;
+    color-scheme: light;
+    scrollbar-color: oklch(0.8 0 0) transparent;
+    scrollbar-width: thin;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* One friendly family; headings are bold, tight and sentence case. */
+  h1, h2, h3, .font-heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  ::selection { background: oklch(0.52 0.2 262); color: oklch(1 0 0); }
+  input, textarea { caret-color: var(--primary); }
+  a { text-underline-offset: 3px; }
+  table { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline-color: var(--primary); }
+}
+
+@layer components {
+  /* Translucent chrome; content scrolls under it. */
+  .material-bar {
+    background: oklch(1 0 0 / 85%);
+    backdrop-filter: blur(16px) saturate(170%);
+    -webkit-backdrop-filter: blur(16px) saturate(170%);
+  }
+  /* Plain surface, kept for older call sites. */
+  .paper { background: var(--card); }
+  /* Feedback on press, never only on release. */
+  .press { transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms; }
+  .press:active { transform: scale(0.985); transition-duration: 60ms; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  @media (max-width: 1023px) {
+    .scroll-fade { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* The one authored motion moment: hero content settles in once on load. */
+@keyframes settle {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
 }
+.settle { animation: settle 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: var(--delay, 0ms); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .material-bar { background: var(--background); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  :root { --border: oklch(0 0 0 / 25%); --muted-foreground: oklch(0.35 0 0); }
+}
+
+/* Cards and popovers are always light surfaces, even when they sit on a coloured field. */
+.bg-card, .bg-popover {
+  --foreground: oklch(0.16 0 0);
+  --muted: oklch(0.92 0 0);
+  --destructive: oklch(0.55 0.21 25);
+  --success: oklch(0.52 0.14 150);
+  --warning: oklch(0.53 0.12 65);
+  --muted-foreground: oklch(0.45 0 0);
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0 0 0 / 14%);
+  --primary-text: oklch(0.52 0.2 262);
+  --ring: oklch(0.52 0.2 262 / 45%);
+}
+
+
+/* Grid items may shrink below their content width, so long names truncate instead of overflowing. */
+:where(.grid) > * { min-width: 0; }
+
+/* Soft surfaces carry no outline: the gray fill is the edge. Dividers inside still use --border. */
+.bg-card { border-color: transparent !important; }

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T12:00:00Z",
+  "title": "Design System: DROPZONE",
+  "extensions": {
+    "colorMeta": {
+      "brand-blue": { "role": "primary", "displayName": "Brand Blue", "canonical": "oklch(0.52 0.2 262)", "tonalRamp": ["oklch(0.15 0.05 262)", "oklch(0.25 0.1 262)", "oklch(0.37 0.15 262)", "oklch(0.52 0.2 262)", "oklch(0.64 0.15 262)", "oklch(0.75 0.1 262)", "oklch(0.86 0.06 262)", "oklch(0.95 0.02 262)"] },
+      "brand-blue-pressed": { "role": "primary", "displayName": "Pressed Blue", "canonical": "oklch(0.47 0.2 262)", "tonalRamp": ["oklch(0.15 0.05 262)", "oklch(0.25 0.1 262)", "oklch(0.35 0.15 262)", "oklch(0.47 0.2 262)", "oklch(0.6 0.15 262)", "oklch(0.72 0.1 262)", "oklch(0.85 0.06 262)", "oklch(0.95 0.02 262)"] },
+      "white-ground": { "role": "neutral", "displayName": "White Ground", "canonical": "oklch(1 0 0)", "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.27 0 0)", "oklch(0.4 0 0)", "oklch(0.53 0 0)", "oklch(0.66 0 0)", "oklch(0.79 0 0)", "oklch(0.9 0 0)", "oklch(1 0 0)"] },
+      "soft-gray": { "role": "neutral", "displayName": "Soft Gray", "canonical": "oklch(0.967 0 0)", "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.27 0 0)", "oklch(0.4 0 0)", "oklch(0.53 0 0)", "oklch(0.66 0 0)", "oklch(0.79 0 0)", "oklch(0.9 0 0)", "oklch(0.967 0 0)"] },
+      "quiet-fill": { "role": "neutral", "displayName": "Quiet Fill", "canonical": "oklch(0.935 0 0)", "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.27 0 0)", "oklch(0.4 0 0)", "oklch(0.53 0 0)", "oklch(0.66 0 0)", "oklch(0.79 0 0)", "oklch(0.88 0 0)", "oklch(0.935 0 0)"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "oklch(0.16 0 0)", "tonalRamp": ["oklch(0.12 0 0)", "oklch(0.16 0 0)", "oklch(0.26 0 0)", "oklch(0.4 0 0)", "oklch(0.55 0 0)", "oklch(0.7 0 0)", "oklch(0.85 0 0)", "oklch(0.95 0 0)"] },
+      "footer-black": { "role": "neutral", "displayName": "Footer Black", "canonical": "oklch(0.12 0 0)", "tonalRamp": ["oklch(0.12 0 0)", "oklch(0.2 0 0)", "oklch(0.3 0 0)", "oklch(0.42 0 0)", "oklch(0.55 0 0)", "oklch(0.7 0 0)", "oklch(0.85 0 0)", "oklch(0.95 0 0)"] },
+      "muted-ink": { "role": "neutral", "displayName": "Muted Ink", "canonical": "oklch(0.45 0 0)", "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.25 0 0)", "oklch(0.35 0 0)", "oklch(0.45 0 0)", "oklch(0.6 0 0)", "oklch(0.73 0 0)", "oklch(0.86 0 0)", "oklch(0.95 0 0)"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "oklch(0 0 0 / 8%)", "tonalRamp": ["oklch(0 0 0 / 4%)", "oklch(0 0 0 / 8%)", "oklch(0 0 0 / 14%)", "oklch(0 0 0 / 25%)", "oklch(0 0 0 / 40%)", "oklch(0 0 0 / 55%)", "oklch(0 0 0 / 70%)", "oklch(0 0 0 / 85%)"] },
+      "input-line": { "role": "neutral", "displayName": "Input Line", "canonical": "oklch(0 0 0 / 14%)", "tonalRamp": ["oklch(0 0 0 / 4%)", "oklch(0 0 0 / 8%)", "oklch(0 0 0 / 14%)", "oklch(0 0 0 / 25%)", "oklch(0 0 0 / 40%)", "oklch(0 0 0 / 55%)", "oklch(0 0 0 / 70%)", "oklch(0 0 0 / 85%)"] },
+      "confirmed-green": { "role": "status", "displayName": "Confirmed Green", "canonical": "oklch(0.52 0.14 150)", "tonalRamp": ["oklch(0.15 0.04 150)", "oklch(0.26 0.08 150)", "oklch(0.38 0.11 150)", "oklch(0.52 0.14 150)", "oklch(0.64 0.12 150)", "oklch(0.76 0.09 150)", "oklch(0.87 0.05 150)", "oklch(0.95 0.02 150)"] },
+      "pending-amber": { "role": "status", "displayName": "Pending Amber", "canonical": "oklch(0.53 0.12 65)", "tonalRamp": ["oklch(0.15 0.03 65)", "oklch(0.26 0.06 65)", "oklch(0.39 0.09 65)", "oklch(0.53 0.12 65)", "oklch(0.65 0.12 65)", "oklch(0.77 0.1 65)", "oklch(0.88 0.06 65)", "oklch(0.96 0.02 65)"] },
+      "rejected-red": { "role": "status", "displayName": "Rejected Red", "canonical": "oklch(0.55 0.21 25)", "tonalRamp": ["oklch(0.15 0.05 25)", "oklch(0.27 0.1 25)", "oklch(0.4 0.16 25)", "oklch(0.55 0.21 25)", "oklch(0.66 0.17 25)", "oklch(0.77 0.12 25)", "oklch(0.88 0.06 25)", "oklch(0.96 0.02 25)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Landing hero headline only; 2.6rem mobile, 3.75rem sm, 4.6rem lg." },
+      "headline": { "displayName": "Headline", "purpose": "Closing-field headline, tournament banner name, champion team names, 'Como funciona'." },
+      "title": { "displayName": "Title", "purpose": "Section and page headings (1.5–2.25rem); ranked-list titles at 1.25rem." },
+      "card-title": { "displayName": "Card Title", "purpose": "Tournament card names; live-card row names at 1.05rem; stat values at 1.5rem." },
+      "body": { "displayName": "Body", "purpose": "Running text and hero subcopy (1.125–1.25rem in the hero)." },
+      "body-sm": { "displayName": "Body Small", "purpose": "Meta lines, nav links, list-row titles, buttons." },
+      "label": { "displayName": "Label", "purpose": "Status and registration badges, slot counts, stat labels, list subtitles." },
+      "label-caps": { "displayName": "Label Caps", "purpose": "Footer and sidebar group headings, table column heads, room-credential labels. Never above a headline." },
+      "micro": { "displayName": "Micro", "purpose": "Demo tag, notification counters, small avatar initials." },
+      "mono": { "displayName": "Mono", "purpose": "Room ID and password values only." }
+    },
+    "shadows": [
+      { "name": "focus-ring", "value": "0 0 0 3px oklch(0.52 0.2 262 / 45%)", "purpose": "Focus ring on buttons, cards and inputs; white at 60% inside a coloured field. The system has no resting shadows." },
+      { "name": "material-bar", "value": "background: oklch(1 0 0 / 85%); backdrop-filter: blur(16px) saturate(170%)", "purpose": "Translucent sticky header, tournament tab bar and mobile bottom bar; opaque white under prefers-reduced-transparency." }
+    ],
+    "motion": [
+      { "name": "press", "value": "transform scale(0.985); 60ms down, 160ms cubic-bezier(0.22, 1, 0.36, 1) return", "purpose": "Pointer-down feedback on every list row and card." },
+      { "name": "settle", "value": "opacity 0 → 1, translateY(10px) → 0; 520ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The one authored motion: hero content on load, staggered by --delay (live card 140ms)." },
+      { "name": "live-ping", "value": "animate-ping on the 6px status dot", "purpose": "Marks live tournaments." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "container", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid blue pill with white text; the default call to action on white ground.",
+      "html": "<button class=\"ds-btn-primary\">Criar conta grátis</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: 9999px; background: var(--primary, oklch(0.52 0.2 262)); color: #fff; font: 600 0.875rem/1 var(--font-geist-sans, Figtree, system-ui, sans-serif); cursor: pointer; transition: background-color 160ms, transform 160ms; } .ds-btn-primary:hover { background: oklch(0.47 0.2 262); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.52 0.2 262 / 45%); } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "On-Field Button",
+      "kind": "button",
+      "refersTo": "button-on-field",
+      "description": "The primary action inverted to a white pill with blue text inside a blue field (tournament banner).",
+      "html": "<div class=\"ds-field\"><button class=\"ds-btn-onfield\">Entrar para se inscrever</button></div>",
+      "css": ".ds-field { background: oklch(0.52 0.2 262); padding: 24px; } .ds-btn-onfield { width: 100%; height: 48px; padding: 0 20px; border: 0; border-radius: 9999px; background: #fff; color: oklch(0.52 0.2 262); font: 600 0.95rem/1 var(--font-geist-sans, Figtree, system-ui, sans-serif); cursor: pointer; transition: background-color 160ms; } .ds-btn-onfield:hover { background: oklch(1 0 0 / 90%); } .ds-btn-onfield:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(1 0 0 / 60%); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet secondary action; hovers to the quiet fill.",
+      "html": "<button class=\"ds-btn-ghost\">Cancelar inscrição</button>",
+      "css": ".ds-btn-ghost { height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: 9999px; background: transparent; color: oklch(0.16 0 0); font: 500 0.875rem/1 var(--font-geist-sans, Figtree, system-ui, sans-serif); cursor: pointer; transition: background-color 160ms; } .ds-btn-ghost:hover { background: oklch(0.935 0 0); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.52 0.2 262 / 45%); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White field with a soft stroke and 22.4px corners; the form input everywhere outside the hero.",
+      "html": "<label class=\"ds-label\">Nome do squad<input class=\"ds-input\" placeholder=\"Ex.: Os Imparáveis\"></label>",
+      "css": ".ds-label { display: grid; gap: 6px; max-width: 360px; font: 500 0.875rem/1.4 var(--font-geist-sans, Figtree, system-ui, sans-serif); color: oklch(0.16 0 0); } .ds-input { height: 44px; padding: 0 14px; border: 1px solid oklch(0 0 0 / 14%); border-radius: 22.4px; background: #fff; color: oklch(0.16 0 0); font: 400 0.875rem/1.5 inherit; outline: none; caret-color: oklch(0.52 0.2 262); transition: border-color 160ms, box-shadow 160ms; } .ds-input::placeholder { color: oklch(0.45 0 0); } .ds-input:focus-visible { border-color: oklch(0.52 0.2 262 / 45%); box-shadow: 0 0 0 3px oklch(0.52 0.2 262 / 22%); }"
+    },
+    {
+      "name": "Hero Search",
+      "kind": "input",
+      "refersTo": "input-hero",
+      "description": "White pill search with a black pill submit, sitting on the blue hero field.",
+      "html": "<div class=\"ds-field\"><form class=\"ds-search\"><span class=\"ds-search-box\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input placeholder=\"Buscar campeonato\" aria-label=\"Buscar campeonato\"></span><button class=\"ds-search-btn\">Buscar</button></form></div>",
+      "css": ".ds-field { background: oklch(0.52 0.2 262); padding: 24px; } .ds-search { display: flex; gap: 8px; max-width: 576px; } .ds-search-box { position: relative; flex: 1; } .ds-search-box svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: oklch(0.45 0 0); pointer-events: none; } .ds-search-box input { width: 100%; height: 52px; padding: 0 16px 0 48px; border: 0; border-radius: 9999px; background: #fff; color: oklch(0.16 0 0); font: 400 1rem/1.5 var(--font-geist-sans, Figtree, system-ui, sans-serif); outline: none; caret-color: oklch(0.52 0.2 262); } .ds-search-box input::placeholder { color: oklch(0.5 0 0); } .ds-search-box input:focus-visible { box-shadow: 0 0 0 3px oklch(1 0 0 / 60%); } .ds-search-btn { height: 52px; padding: 0 24px; border: 0; border-radius: 9999px; background: oklch(0.16 0 0); color: #fff; font: 600 0.95rem/1 var(--font-geist-sans, Figtree, system-ui, sans-serif); cursor: pointer; } .ds-search-btn:hover { background: oklch(0.26 0 0); } .ds-search-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(1 0 0 / 60%); }"
+    },
+    {
+      "name": "Tournament Card",
+      "kind": "card",
+      "refersTo": "card-tournament",
+      "description": "Borderless soft gray card: status dot and date, bold name, organizer, facts joined by middots, and the slot bar; presses on pointer-down.",
+      "html": "<a class=\"ds-tcard\" href=\"#\"><div class=\"ds-tcard-meta\"><span class=\"ds-status\"><span class=\"ds-dot\"></span>Inscrições abertas</span><span class=\"ds-muted\">· 17 de nov, 00:07</span><span class=\"ds-demo\">Demo</span></div><h3 class=\"ds-tcard-title\">Liga Noturna #12</h3><p class=\"ds-muted ds-sm\">Arena Demo</p><p class=\"ds-sm ds-facts\">Squad (4v4) · Gratuito · Com premiação</p><div class=\"ds-slot\"><div class=\"ds-slot-track\"><div class=\"ds-slot-fill\" style=\"width:38%\"></div></div><span class=\"ds-slot-count\"><b>9</b>/24 squads</span></div></a>",
+      "css": ".ds-tcard { display: flex; flex-direction: column; max-width: 380px; padding: 20px; border: 0; border-radius: 35.2px; background: oklch(0.967 0 0); color: oklch(0.16 0 0); text-decoration: none; font-family: var(--font-geist-sans, Figtree, system-ui, sans-serif); transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-tcard:hover .ds-tcard-title { color: oklch(0.52 0.2 262); } .ds-tcard:active { transform: scale(0.985); transition-duration: 60ms; } .ds-tcard:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.52 0.2 262 / 45%); } .ds-tcard-meta { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; } .ds-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: oklch(0.52 0.2 262); } .ds-dot { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; } .ds-muted { color: oklch(0.45 0 0); } .ds-demo { margin-left: auto; padding: 1px 6px; border-radius: 9.6px; background: oklch(0.92 0 0); color: oklch(0.45 0 0); font-size: 10px; font-weight: 500; } .ds-tcard-title { margin: 12px 0 0; font-family: var(--font-display, Figtree, sans-serif); font-weight: 700; font-size: 1.2rem; line-height: 1.1; letter-spacing: -0.025em; transition: color 160ms; } .ds-sm { margin: 4px 0 0; font-size: 0.875rem; } .ds-facts { margin-top: 12px; } .ds-slot { display: flex; align-items: center; gap: 12px; padding-top: 20px; } .ds-slot-track { flex: 1; height: 6px; overflow: hidden; border-radius: 9999px; background: oklch(0.92 0 0); } .ds-slot-fill { height: 100%; border-radius: 9999px; background: oklch(0.52 0.2 262); } .ds-slot-count { font-size: 0.75rem; color: oklch(0.45 0 0); font-variant-numeric: tabular-nums; } .ds-slot-count b { color: oklch(0.16 0 0); font-weight: 600; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Dot plus words, no box. Live pulses blue; never red.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-sb ds-sb-live\"><span class=\"ds-sb-dot\"></span>Em andamento</span><span class=\"ds-sb ds-sb-open\"><span class=\"ds-sb-dot\"></span>Inscrições abertas</span><span class=\"ds-sb ds-sb-closed\"><span class=\"ds-sb-dot\"></span>Inscrições encerradas</span><span class=\"ds-sb ds-sb-done\"><span class=\"ds-sb-dot\"></span>Finalizado</span></div>",
+      "css": ".ds-badges { display: flex; flex-wrap: wrap; gap: 16px; } .ds-sb { display: inline-flex; align-items: center; gap: 6px; font: 600 0.75rem/1.33 var(--font-geist-sans, Figtree, system-ui, sans-serif); } .ds-sb-dot { position: relative; width: 6px; height: 6px; border-radius: 9999px; background: currentColor; } .ds-sb-live { color: oklch(0.16 0 0); } .ds-sb-live .ds-sb-dot { background: oklch(0.52 0.2 262); box-shadow: 0 0 0 0 oklch(0.52 0.2 262 / 60%); animation: ds-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; } .ds-sb-open { color: oklch(0.52 0.2 262); } .ds-sb-closed { color: oklch(0.53 0.12 65); } .ds-sb-done { color: oklch(0.45 0 0); } @keyframes ds-ping { 75%, 100% { box-shadow: 0 0 0 5px oklch(0.52 0.2 262 / 0); } } @media (prefers-reduced-motion: reduce) { .ds-sb-live .ds-sb-dot { animation: none; } }"
+    },
+    {
+      "name": "Ranked List",
+      "kind": "custom",
+      "refersTo": "ranked-list",
+      "description": "Title over a 1px ink rule, hairline-divided rows with a bold rank (rank 1 in blue) and a tabular tail.",
+      "html": "<div class=\"ds-rl\"><div class=\"ds-rl-head\"><h2>Ranking de squads</h2><a href=\"#\">Completo</a></div><ol><li><a href=\"#\"><span class=\"ds-rl-rank ds-first\">1</span><span class=\"ds-rl-main\"><b>Ataque Relâmpago</b><small>1 Booyah</small></span><span class=\"ds-rl-tail\">98</span></a></li><li><a href=\"#\"><span class=\"ds-rl-rank\">2</span><span class=\"ds-rl-main\"><b>Os Imparáveis</b><small>1 Booyah</small></span><span class=\"ds-rl-tail\">79</span></a></li></ol></div>",
+      "css": ".ds-rl { max-width: 360px; font-family: var(--font-geist-sans, Figtree, system-ui, sans-serif); color: oklch(0.16 0 0); } .ds-rl-head { display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid oklch(0.16 0 0); } .ds-rl-head h2 { margin: 0; font-family: var(--font-display, Figtree, sans-serif); font-weight: 700; font-size: 1.25rem; letter-spacing: -0.025em; line-height: 1.1; } .ds-rl-head a { font-size: 0.875rem; font-weight: 500; color: oklch(0.52 0.2 262); text-decoration: none; } .ds-rl-head a:hover { text-decoration: underline; } .ds-rl ol { margin: 0; padding: 0; list-style: none; } .ds-rl li + li { border-top: 1px solid oklch(0 0 0 / 8%); } .ds-rl li a { display: flex; align-items: center; gap: 12px; margin: 0 -8px; padding: 12px 8px; border-radius: 12.8px; color: inherit; text-decoration: none; transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms; } .ds-rl li a:hover { background: oklch(0.935 0 0 / 70%); } .ds-rl li a:active { transform: scale(0.985); transition-duration: 60ms; } .ds-rl li a:focus-visible { outline: 2px solid oklch(0.52 0.2 262); } .ds-rl-rank { width: 48px; flex-shrink: 0; font-family: var(--font-display, Figtree, sans-serif); font-weight: 700; font-size: 0.875rem; color: oklch(0.45 0 0); font-variant-numeric: tabular-nums; } .ds-rl-rank.ds-first { color: oklch(0.52 0.2 262); } .ds-rl-main { flex: 1; min-width: 0; } .ds-rl-main b { display: block; font-size: 0.875rem; font-weight: 600; } .ds-rl-main small { display: block; font-size: 0.75rem; color: oklch(0.45 0 0); } .ds-rl-tail { font-family: var(--font-display, Figtree, sans-serif); font-weight: 700; font-size: 1rem; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Site Header",
+      "kind": "nav",
+      "refersTo": "nav-header",
+      "description": "Sticky translucent white header: logo, muted links that turn ink when current, blue pill sign-up on the right.",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-nav-logo\">DROPZONE</span><nav><a href=\"#\" aria-current=\"page\">Início</a><a href=\"#\">Campeonatos</a><a href=\"#\">Rankings</a><a href=\"#\">Equipes</a></nav><span class=\"ds-nav-end\"><a href=\"#\">Entrar</a><button class=\"ds-nav-cta\">Criar conta</button></span></header>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 16px; height: 56px; padding: 0 24px; border-bottom: 1px solid oklch(0 0 0 / 8%); background: oklch(1 0 0 / 85%); backdrop-filter: blur(16px) saturate(170%); -webkit-backdrop-filter: blur(16px) saturate(170%); font-family: var(--font-geist-sans, Figtree, system-ui, sans-serif); } .ds-nav-logo { font-family: var(--font-display, Figtree, sans-serif); font-weight: 700; font-size: 1rem; color: oklch(0.16 0 0); } .ds-nav nav { display: flex; gap: 4px; } .ds-nav a { padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; color: oklch(0.45 0 0); text-decoration: none; transition: color 160ms; } .ds-nav a:hover, .ds-nav a[aria-current=page] { color: oklch(0.16 0 0); } .ds-nav a:focus-visible { outline: 2px solid oklch(0.52 0.2 262); } .ds-nav-end { margin-left: auto; display: flex; align-items: center; gap: 8px; } .ds-nav-cta { height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: oklch(0.52 0.2 262); color: #fff; font: 600 0.875rem/1 inherit; cursor: pointer; } .ds-nav-cta:hover { background: oklch(0.47 0.2 262); } .ds-nav-cta:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.52 0.2 262 / 45%); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Friendly Blue Field",
+    "overview": "DROPZONE is a calm, friendly tournament product with the clarity of a modern consumer finance app. The ground is pure white, surfaces are soft gray fills with no outline, corners are generous, and type is near-black. One brand blue does all the colour work: it fills whole full-bleed regions (the landing hero, the tournament banner, the champions band) and marks every primary action. Black closes long pages, first as a closing field, then a deeper black footer. Inside any coloured field, text and lines invert to white; a card placed on a field stays light.\n\nOne rounded geometric sans (Figtree) carries everything, with headings bold, tight and in sentence case; Geist Mono appears only for room codes. Hierarchy comes from type size and weight, and grouping comes from soft gray fills, not from borders, icons or shadows. Buttons are pills, inputs are softly rounded white fields, avatars are circles. Status is a small dot plus words. Motion is minimal and physical: rows and cards press on pointer-down, and hero content settles in once on load.\n\nThe system rejects the dark esports dashboard (near-black canvas, neon accent, glowing cards, grids, gradients, tilted or hollow type) and the poster costume of flat black boxes and condensed display type.",
+    "keyCharacteristics": [
+      "White ground, soft gray borderless surfaces, near-black ink.",
+      "Blue as full-bleed fields with white type, or as the primary action; blue ink for links and the leading item in a list.",
+      "One friendly sans for everything; headings 700, tight tracking, sentence case.",
+      "Pills for buttons and filters, softly rounded inputs, circular avatars, large-radius cards.",
+      "Status as dot plus words, never a coloured box.",
+      "Flat: no shadows, no gradients, no glows.",
+      "One authored motion (settle) plus press feedback."
+    ],
+    "rules": [
+      { "name": "The One Blue Rule", "body": "Blue either owns a whole full-bleed region or marks an action, a link or the leading item. It is never a decorative tint, wash, gradient or glow. The sanctioned faint uses are the active sidebar item (oklch 0.95 0.02 262) and a 5–7% wash marking the viewer's own row.", "section": "colors" },
+      { "name": "The Inversion Rule", "body": "A coloured region (blue or black) carries the inverted-field scope: foreground, muted text, borders, inputs, focus ring and every status ink turn white. A card or popover inside that region resets to the light surface values. Never hand-colour text white inside a field; invert the scope.", "section": "colors" },
+      { "name": "The Live Is Blue Rule", "body": "\"Ao vivo\" is a pulsing blue dot (white on a field) with ink words. Live is never red.", "section": "colors" },
+      { "name": "The One Family Rule", "body": "Figtree sets everything; headings are 700 with -0.025em tracking, sentence case, never all caps. Geist Mono is only for codes a player copies.", "section": "typography" },
+      { "name": "The Tabular Numbers Rule", "body": "Counts, points, dates and tables use tabular figures.", "section": "typography" },
+      { "name": "The Fill Is The Edge Rule", "body": "Surfaces separate by fill, never by outline or shadow: a soft gray card on white has a transparent border, always. Hairlines are for dividing rows inside a surface. Groups of stats share one rounded surface split by 1px white gaps rather than becoming a wall of floating cards.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do give blue whole full-bleed regions (hero, tournament banner, champions band) with white type on them, using the inverted-field scope.",
+      "Do make cards soft gray fills with no border and the largest corner; keep the live card on a blue field white.",
+      "Do make buttons, search fields, filters and avatars fully round.",
+      "Do close long pages with a black field followed by the deeper black footer.",
+      "Do show status as a 6px dot plus words; use blue for live and open, never red for live.",
+      "Do set headings in Figtree 700 with -0.025em tracking, sentence case, and tabular figures for numbers.",
+      "Do make every list row and card press (scale 0.985) on pointer-down.",
+      "Do label every demo record with the Demo tag."
+    ],
+    "donts": [
+      "Don't scatter blue as decorative tints, washes or accents; it is a field, an action or link ink.",
+      "Don't outline a soft gray card or give it a shadow; the fill is the edge.",
+      "Don't use gradients, glows, grid textures, tilted elements or hollow or outlined type.",
+      "Don't put status in a coloured box or chip, or use green, amber or red as a fill.",
+      "Don't set headings in all caps or bring in a second display family.",
+      "Don't place decorative icons beside facts; facts are joined with middots. Icons belong to navigation, actions and the official-organizer mark.",
+      "Don't introduce a dark canvas with neon accents; the ground is white.",
+      "Don't put a small uppercase label above a headline."
+    ]
+  }
+}
