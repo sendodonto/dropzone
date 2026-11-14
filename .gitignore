@@ -42,3 +42,5 @@ next-env.d.ts
 
 # example env is safe to commit
 !.env.example
+
+.vercel
