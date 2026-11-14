@@ -16,7 +16,7 @@ const STEPS = ["Informações", "Configurações", "Premiação", "Regulamento",
 const FIELD_STEP: Record<string, number> = {
   name: 0, description: 0, mode: 0, region: 0, platform: 0, cover_url: 0, logo_url: 0,
   max_teams: 1, team_size: 1, reserves_allowed: 1, matches_count: 1, starts_at: 1, registration_opens_at: 1, registration_closes_at: 1, visibility: 1,
-  entry_type: 2, entry_fee: 2, prize_pool: 2, prize_description: 2,
+  entry_type: 2, entry_fee: 2, payment_instructions: 2, prize_pool: 2, prize_description: 2,
   rules: 3, placement_points: 3, kill_points: 3, max_bonus: 3, dispute_window_minutes: 3,
 };
 const SIZE: Record<GameMode, number> = { squad: 4, duo: 2, solo: 1 };
@@ -25,7 +25,7 @@ export type WizardDefaults = {
   name?: string; description?: string | null; cover_url?: string | null; logo_url?: string | null; mode?: GameMode;
   platform?: string; region?: string; max_teams?: number; reserves_allowed?: number; matches_count?: number;
   starts_at?: string; registration_opens_at?: string; registration_closes_at?: string; requires_approval?: boolean;
-  visibility?: string; entry_type?: string; entry_fee?: number; prize_pool?: number; prize_description?: string | null;
+  visibility?: string; entry_type?: string; entry_fee?: number; payment_instructions?: string | null; prize_pool?: number; prize_description?: string | null;
   dispute_window_minutes?: number; rules?: string; season_id?: string | null; placement_points?: number[]; kill_points?: number; max_bonus?: number;
   tiebreakers?: Tiebreaker[]; prizes?: { position: number; label: string; amount: number }[]; sponsors?: { name: string; url: string }[];
 };
@@ -56,7 +56,7 @@ export function TournamentWizard({ organizerId, organizerName, tournamentId, def
     if (v.name.trim().length < 3) out.push("Informe o nome do campeonato.");
     if (!v.starts_at) out.push("Defina data e horário de início.");
     else if (!tournamentId && new Date(localInputToIso(v.starts_at)!) <= new Date()) out.push("A data de início precisa estar no futuro.");
-    if (v.entry_type === "paid" && v.entry_fee <= 0) out.push("Informe o valor da inscrição.");
+    if ((v.entry_type === "paid" || v.entry_type === "external") && v.entry_fee <= 0) out.push("Informe o valor da inscrição.");
     return out;
   }, [v, tournamentId]);
 
@@ -140,7 +140,7 @@ export function TournamentWizard({ organizerId, organizerName, tournamentId, def
       <fieldset className={cn("grid gap-4", step !== 2 && "hidden")}>
         <legend className="sr-only">Premiação e inscrições</legend>
         <SelectField name="entry_type" label="Tipo de participação" defaultValue={v.entry_type} onChange={(x) => setV((p) => ({ ...p, entry_type: x }))}
-          options={[{ value: "free", label: "Gratuita" }, { value: "sponsored", label: "Gratuita com patrocínio" }, { value: "paid", label: "Paga (requer habilitação)" }]} />
+          options={[{ value: "free", label: "Gratuita" }, { value: "sponsored", label: "Gratuita com patrocínio" }, { value: "external", label: "Paga direto ao organizador (Pix)" }, { value: "paid", label: "Paga pela plataforma (requer habilitação)" }]} />
         {v.entry_type === "paid" && (
           <div className="grid gap-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
             <p className="flex gap-2"><AlertTriangle className="size-4 shrink-0 text-warning" aria-hidden />
@@ -149,7 +149,17 @@ export function TournamentWizard({ organizerId, organizerName, tournamentId, def
             <Field name="entry_fee" label="Valor por equipe (R$)" type="number" min={0} step="0.01" value={v.entry_fee} onChange={set("entry_fee")} />
           </div>
         )}
-        {v.entry_type !== "paid" && <input type="hidden" name="entry_fee" value="0" />}
+        {v.entry_type === "external" && (
+          <div className="grid gap-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+            <p className="flex gap-2"><AlertTriangle className="size-4 shrink-0 text-warning" aria-hidden />
+              O pagamento é feito direto a você, fora da plataforma. Cada inscrição fica pendente até você aprovar depois de receber. A cobrança e a premiação são de sua responsabilidade.
+            </p>
+            <Field name="entry_fee" label="Valor por equipe (R$)" type="number" min={0} step="0.01" value={v.entry_fee} onChange={set("entry_fee")} />
+            <Field name="payment_instructions" label="Como pagar" textarea rows={3} maxLength={500} defaultValue={defaults.payment_instructions ?? ""}
+              placeholder="ex.: Pix para a chave X em nome de Y. Envie o comprovante com o nome do squad no WhatsApp Z." />
+          </div>
+        )}
+        {v.entry_type !== "paid" && v.entry_type !== "external" && <input type="hidden" name="entry_fee" value="0" />}
         <div className="grid gap-4 sm:grid-cols-2">
           <Field name="prize_pool" label="Premiação total anunciada (R$)" type="number" min={0} step="0.01" value={v.prize_pool} onChange={set("prize_pool")} hint="0 se não houver valor em dinheiro." />
           <Field name="prize_description" label="Descrição da premiação" maxLength={500} defaultValue={defaults.prize_description ?? ""} placeholder="ex.: troféu digital + skins sorteadas" />
@@ -238,7 +248,7 @@ export function TournamentWizard({ organizerId, organizerName, tournamentId, def
             <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><CalendarClock className="size-3.5" />{v.starts_at ? formatDateTime(localInputToIso(v.starts_at)) : "—"}</span>
               <span className="flex items-center gap-1"><Users className="size-3.5" />{modeLabel[v.mode]}</span>
-              <span className="flex items-center gap-1"><Ticket className="size-3.5" />{v.entry_type === "paid" ? formatMoney(v.entry_fee * 100) : entryLabel[v.entry_type as "free"]}</span>
+              <span className="flex items-center gap-1"><Ticket className="size-3.5" />{v.entry_type === "paid" || v.entry_type === "external" ? formatMoney(v.entry_fee * 100) : entryLabel[v.entry_type as "free"]}</span>
               <span className="flex items-center gap-1"><Gift className="size-3.5" />{v.prize_pool > 0 ? formatMoney(v.prize_pool * 100) : "—"}</span>
             </div>
             <p className="text-xs">0/{v.max_teams} {v.mode === "solo" ? "jogadores" : "squads"} · {v.matches_count} quedas</p>

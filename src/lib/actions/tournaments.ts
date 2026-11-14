@@ -56,8 +56,10 @@ export async function saveTournament(organizerId: string, tournamentId: string |
     reserves_allowed: d.reserves_allowed, matches_count: d.matches_count, starts_at: startsAt,
     registration_opens_at: d.registration_opens_at ? localInputToIso(d.registration_opens_at) : null,
     registration_closes_at: d.registration_closes_at ? localInputToIso(d.registration_closes_at) : null,
-    requires_approval: d.requires_approval, visibility: d.visibility, entry_type: d.entry_type,
-    entry_fee_cents: d.entry_type === "paid" ? Math.round(d.entry_fee * 100) : 0,
+    // External fees always need manual approval: the organizer confirms each payment (DB enforces it too).
+    requires_approval: d.requires_approval || d.entry_type === "external", visibility: d.visibility, entry_type: d.entry_type,
+    entry_fee_cents: d.entry_type === "paid" || d.entry_type === "external" ? Math.round(d.entry_fee * 100) : 0,
+    payment_instructions: d.entry_type === "external" ? d.payment_instructions : null,
     prize_pool_cents: Math.round(d.prize_pool * 100), prize_description: d.prize_description,
     dispute_window_minutes: d.dispute_window_minutes, season_id: d.season_id,
   };

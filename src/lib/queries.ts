@@ -34,7 +34,7 @@ export async function listTournaments(f: TournamentFilters = {}): Promise<Tourna
   else if (f.status === "upcoming") q = q.in("status", ["registration_open", "registration_closed"]);
   else q = q.neq("status", "cancelled");
   if (f.price === "free") q = q.in("entry_type", ["free", "sponsored"]);
-  if (f.price === "paid") q = q.eq("entry_type", "paid");
+  if (f.price === "paid") q = q.in("entry_type", ["paid", "external"]);
   if (f.mode) q = q.eq("mode", f.mode);
   if (f.from) q = q.gte("starts_at", new Date(`${f.from}T00:00:00-03:00`).toISOString());
   if (f.prize === "with") q = q.or("prize_pool_cents.gt.0,prize_description.not.is.null");

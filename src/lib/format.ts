@@ -72,7 +72,10 @@ export const registrationLabel: Record<RegistrationStatus, string> = {
 };
 
 export const modeLabel: Record<GameMode, string> = { squad: "Squad (4v4)", duo: "Duo", solo: "Solo" };
-export const entryLabel: Record<EntryType, string> = { free: "Gratuito", paid: "Pago", sponsored: "Patrocinado" };
+export const entryLabel: Record<EntryType, string> = { free: "Gratuito", paid: "Pago", sponsored: "Patrocinado", external: "Pago ao organizador" };
+/** Entry shown on cards and headers: the fee when there is one, otherwise the label. */
+export const entryText = (t: { entry_type: EntryType; entry_fee_cents: number }) =>
+  t.entry_type === "paid" || t.entry_type === "external" ? formatMoney(t.entry_fee_cents) : entryLabel[t.entry_type];
 export const platformLabel = { mobile: "Mobile", emulator: "Emulador", mixed: "Misto" } as const;
 
 export const reportReasonLabel = {

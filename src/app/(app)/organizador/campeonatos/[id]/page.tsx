@@ -116,7 +116,7 @@ export default async function ManageTournamentPage({ params, searchParams }: Pag
                 region: t.region, max_teams: t.max_teams, reserves_allowed: t.reserves_allowed, matches_count: t.matches_count,
                 starts_at: isoToLocalInput(t.starts_at), registration_opens_at: isoToLocalInput(t.registration_opens_at),
                 registration_closes_at: isoToLocalInput(t.registration_closes_at), requires_approval: t.requires_approval,
-                visibility: t.visibility, entry_type: t.entry_type, entry_fee: t.entry_fee_cents / 100, prize_pool: t.prize_pool_cents / 100,
+                visibility: t.visibility, entry_type: t.entry_type, entry_fee: t.entry_fee_cents / 100, payment_instructions: t.payment_instructions, prize_pool: t.prize_pool_cents / 100,
                 prize_description: t.prize_description, dispute_window_minutes: t.dispute_window_minutes, rules: b.rules, season_id: t.season_id,
                 placement_points: scoring.placementPoints, kill_points: scoring.killPoints, max_bonus: scoring.maxBonus, tiebreakers: scoring.tiebreakers,
                 prizes: b.prizes.map((p) => ({ position: p.position, label: p.label, amount: p.amount_cents / 100 })),

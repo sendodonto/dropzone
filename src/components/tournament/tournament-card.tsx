@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { StatusBadge } from "@/components/shared/ui-bits";
-import { entryLabel, formatDateTime, formatMoney, modeLabel } from "@/lib/format";
+import { entryText, formatDateTime, formatMoney, modeLabel } from "@/lib/format";
 import { regCount } from "@/lib/queries";
 import type { TournamentCardData } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ export function prizeText(t: Pick<TournamentCardData, "prize_pool_cents" | "priz
 export function TournamentCard({ t, className }: { t: TournamentCardData; className?: string }) {
   const taken = regCount(t);
   const prize = prizeText(t);
-  const facts = [modeLabel[t.mode], t.entry_type === "paid" ? formatMoney(t.entry_fee_cents) : entryLabel[t.entry_type], prize].filter(Boolean);
+  const facts = [modeLabel[t.mode], entryText(t), prize].filter(Boolean);
   return (
     <Link
       href={`/campeonatos/${t.slug}`}

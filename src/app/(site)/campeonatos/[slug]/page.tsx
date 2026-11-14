@@ -107,7 +107,7 @@ export default async function TournamentPage({ params, searchParams }: PageProps
               <Fact label="Início" value={formatDateTime(t.starts_at)} />
               <Fact label="Vagas" value={`${active.length}/${t.max_teams}`} />
               <Fact label="Modalidade" value={modeLabel[t.mode]} />
-              <Fact label="Inscrição" value={t.entry_type === "paid" ? formatMoney(t.entry_fee_cents) : entryLabel[t.entry_type]} />
+              <Fact label="Inscrição" value={t.entry_type === "external" ? `${formatMoney(t.entry_fee_cents)} por equipe` : t.entry_type === "paid" ? formatMoney(t.entry_fee_cents) : entryLabel[t.entry_type]} />
               <Fact label="Premiação" value={t.prize_pool_cents ? formatMoney(t.prize_pool_cents) : t.prize_description ? "Ver detalhes" : "Sem premiação"} />
             </dl>
           </div>
@@ -155,6 +155,13 @@ export default async function TournamentPage({ params, searchParams }: PageProps
                     ? <Link href="?tab=classificacao" scroll={false} className={cn(buttonVariants({ size: "lg" }), "h-12 w-full bg-white text-primary hover:bg-white/90")}>Ver classificação ao vivo</Link>
                     : "Inscrições encerradas."}
               </p>
+            )}
+            {t.entry_type === "external" && t.payment_instructions && (regOpen || myActive) && (
+              <div className="mt-4 rounded-2xl bg-white/12 p-4 text-sm">
+                <p className="font-semibold">Pagamento da inscrição: {formatMoney(t.entry_fee_cents)} por equipe</p>
+                <p className="mt-1 whitespace-pre-line">{t.payment_instructions}</p>
+                <p className="mt-2 text-xs opacity-80">Pago direto ao organizador, fora da plataforma. A vaga é confirmada quando o organizador aprovar a inscrição.</p>
+              </div>
             )}
             {t.requires_approval && regOpen && !myActive && <p className="mt-2 text-xs text-muted-foreground">Inscrições passam por aprovação do organizador.</p>}
           </div>

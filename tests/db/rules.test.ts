@@ -27,6 +27,30 @@ beforeAll(async () => {
   await db.query("update platform_settings set value = 'true' where key = 'organizing_open'");
 });
 
+describe("entry fee paid to the organizer (external)", () => {
+  it("needs a fee, payment instructions and manual approval; publishes and registers as pending", async () => {
+    const official = (await db.query<{ id: string }>("select id from organizers where is_official limit 1")).rows[0].id;
+    const owner = await userId(db, "dropzone_oficial");
+    const insert = "insert into tournaments(organizer_id, name, starts_at, entry_type, entry_fee_cents, requires_approval, payment_instructions) values ($1, $2, now() + interval '3 days', 'external', $3, $4, $5) returning id";
+    expect(await failsAs(db, owner, insert, [official, "Sem aprovação", 3000, false, "Pix chave X"])).toMatch(/external_fee_check/);
+    expect(await failsAs(db, owner, insert, [official, "Sem instruções", 3000, true, null])).toMatch(/external_fee_check/);
+    await as(db, owner, async (q) => {
+      const id = (await q<{ id: string }>(insert, [official, "Copa Pix", 3000, true, "Pix chave X"])).rows[0].id;
+      await q("select public.publish_tournament($1)", [id]);
+      const st = await q<{ status: string }>("select status from tournaments where id = $1", [id]);
+      expect(st.rows[0].status).toBe("registration_open");
+    }, { keep: true });
+    const id = (await db.query<{ id: string }>("select id from tournaments where name = 'Copa Pix'")).rows[0].id;
+    const players = (await roster(ids.demoSquad)).slice(0, 4);
+    await as(db, ids.player, async (q) => {
+      const rid = (await q<{ register_team: string }>("select public.register_team($1, $2, $3::uuid[])", [id, ids.demoSquad, players])).rows[0].register_team;
+      const r = await q<{ status: string }>("select status from tournament_registrations where id = $1", [rid]);
+      expect(r.rows[0].status).toBe("pending");
+    });
+    await db.query("delete from tournaments where id = $1", [id]);
+  });
+});
+
 describe("organizing gate (organizing_open = false)", () => {
   it("only official organizers and admins can create organizers or tournaments", async () => {
     await db.query("update platform_settings set value = 'false' where key = 'organizing_open'");

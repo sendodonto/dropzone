@@ -5,7 +5,7 @@ export type GameMode = "squad" | "duo" | "solo";
 export type TournamentStatus = "draft" | "registration_open" | "registration_closed" | "live" | "finished" | "cancelled";
 export type RegistrationStatus = "pending" | "confirmed" | "rejected" | "withdrawn" | "removed";
 export type MatchStatus = "scheduled" | "live" | "finished" | "cancelled";
-export type EntryType = "free" | "paid" | "sponsored";
+export type EntryType = "free" | "paid" | "sponsored" | "external";
 export type Visibility = "public" | "unlisted" | "private";
 export type RoomAudience = "all_participants" | "confirmed" | "specific";
 export type PaymentStatus = "pending" | "in_review" | "confirmed" | "declined" | "refunded";
@@ -79,6 +79,8 @@ export interface Tournament {
   requires_approval: boolean;
   entry_type: EntryType;
   entry_fee_cents: number;
+  /** For entry_type 'external': how to pay the organizer (e.g. Pix key). */
+  payment_instructions?: string | null;
   paid_request_status: "none" | "requested" | "approved" | "denied";
   payments_enabled: boolean;
   prize_pool_cents: number;

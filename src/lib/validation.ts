@@ -81,7 +81,8 @@ export const tournamentSchema = z
     registration_closes_at: dt.optional().or(z.literal("")),
     requires_approval: checkbox,
     visibility: z.enum(["public", "unlisted", "private"]),
-    entry_type: z.enum(["free", "paid", "sponsored"]),
+    entry_type: z.enum(["free", "paid", "sponsored", "external"]),
+    payment_instructions: optionalText(500),
     entry_fee: z.coerce.number().min(0).max(10000).default(0),
     prize_pool: z.coerce.number().min(0).max(1_000_000).default(0),
     prize_description: optionalText(500),
@@ -102,7 +103,8 @@ export const tournamentSchema = z
     if (v.mode === "squad" && v.team_size !== 4) ctx.addIssue({ code: "custom", path: ["team_size"], message: "Squad usa 4 jogadores." });
     if (v.mode === "duo" && v.team_size !== 2) ctx.addIssue({ code: "custom", path: ["team_size"], message: "Duo usa 2 jogadores." });
     if (v.mode === "solo" && v.team_size !== 1) ctx.addIssue({ code: "custom", path: ["team_size"], message: "Solo usa 1 jogador." });
-    if (v.entry_type === "paid" && v.entry_fee <= 0) ctx.addIssue({ code: "custom", path: ["entry_fee"], message: "Informe o valor da inscrição." });
+    if ((v.entry_type === "paid" || v.entry_type === "external") && v.entry_fee <= 0) ctx.addIssue({ code: "custom", path: ["entry_fee"], message: "Informe o valor da inscrição." });
+    if (v.entry_type === "external" && !v.payment_instructions) ctx.addIssue({ code: "custom", path: ["payment_instructions"], message: "Explique como pagar (ex.: chave Pix)." });
     if (v.registration_opens_at && v.registration_closes_at && v.registration_closes_at <= v.registration_opens_at)
       ctx.addIssue({ code: "custom", path: ["registration_closes_at"], message: "O encerramento deve ser depois da abertura." });
     if (v.registration_closes_at && v.registration_closes_at > v.starts_at)
