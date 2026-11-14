@@ -123,6 +123,12 @@ describe("apostados (wagers)", () => {
     expect(w).toEqual({ status: "finished", winner: "a" });
   });
 
+  it("internal helpers cannot be called through the API", async () => {
+    const wid = (await db.query<{ id: string }>("select id from wagers limit 1")).rows[0].id;
+    expect(await failsAs(db, ids.player, "select public.notify_wager($1, 'Falso', 'spam')", [wid])).toMatch(/permission denied/);
+    expect(await failsAs(db, null, "select public.create_wager(1, 300, 1, 'Bermuda', null, null, '{}'::uuid[])")).toMatch(/permission denied/);
+  });
+
   it("conflicting reports open a dispute; the kill switch blocks new wagers", async () => {
     const a = ids.p001, b = ids.stranger;
     const wid = (await as(db, a, (q) => q<{ id: string }>("select public.create_wager(1, 300, 3, 'Kalahari', 'só pistola', null, $1::uuid[]) as id", [[a]]), { keep: true })).rows[0].id;
