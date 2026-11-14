@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
-import { DemoBadge, StatusBadge } from "@/components/shared/ui-bits";
+import { StatusBadge } from "@/components/shared/ui-bits";
 import { entryLabel, formatDateTime, formatMoney, modeLabel } from "@/lib/format";
 import { regCount } from "@/lib/queries";
 import type { TournamentCardData } from "@/lib/types";
@@ -46,7 +46,6 @@ export function TournamentCard({ t, className }: { t: TournamentCardData; classN
       <div className="flex items-center gap-2 text-xs">
         <StatusBadge status={t.status} />
         <span className="text-muted-foreground">· {formatDateTime(t.starts_at)}</span>
-        {t.is_demo && <DemoBadge className="ml-auto" />}
       </div>
       <h3 className="mt-3 line-clamp-2 text-[1.2rem] group-hover:text-primary-text">{t.name}</h3>
       <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">

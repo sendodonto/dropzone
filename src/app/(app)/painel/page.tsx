@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bell, Crosshair, Hash, ListOrdered, Medal, Swords, Target, Trophy, Users } from "lucide-react";
+import { Crosshair, Hash, ListOrdered, Medal, Swords, Target, Trophy, Users } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { Avatar, DemoBadge, EmptyState, PageHeader, RegistrationBadge, Section, StatGroup, StatTile, StatusBadge } from "@/components/shared/ui-bits";
+import { Avatar, EmptyState, PageHeader, RegistrationBadge, Section, StatGroup, StatTile, StatusBadge } from "@/components/shared/ui-bits";
 import { InviteList } from "@/components/app/invite-card";
 import { AchievementGrid, type AchievementRow } from "@/components/shared/achievements";
 import { requireViewer } from "@/lib/auth";
@@ -27,14 +27,18 @@ export default async function DashboardPage() {
   const s = (summary.data ?? {}) as { tournaments?: number; titles?: number; wins?: number; kills?: number; points?: number; avg_placement?: number; ranking_position?: number };
   const active = regs.filter((r) => ["registration_open", "registration_closed", "live"].includes(r.tournament.status) && ["pending", "confirmed"].includes(r.status));
   const name = viewer.profile.display_name ?? viewer.profile.username;
+  const notifications = (notifs.data ?? []) as Notification[];
+  const earned = (achievements.data ?? []) as unknown as AchievementRow[];
 
   return (
     <div className="grid gap-10">
-      <PageHeader title={`E aí, ${name}!`} description="Seus campeonatos, squads e resultados em um só lugar."
+      <PageHeader title={`E aí, ${name}!`}
         actions={<Link href="/campeonatos?status=open" className={buttonVariants()}><Swords /> Encontrar campeonato</Link>} />
 
       {invites.length > 0 && <Section title="Convites pendentes"><InviteList invites={invites} /></Section>}
 
+      {/* Stats only once there is something to count; a row of zeros is noise. */}
+      {(s.tournaments ?? 0) > 0 && (
       <StatGroup className="grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
         <StatTile label="Campeonatos" value={s.tournaments ?? 0} icon={Trophy} />
         <StatTile label="Títulos" value={s.titles ?? 0} icon={Medal} />
@@ -43,8 +47,9 @@ export default async function DashboardPage() {
         <StatTile label="Posição média" value={s.avg_placement ?? "—"} icon={ListOrdered} />
         <StatTile label="Ranking" value={s.ranking_position ? `#${s.ranking_position}` : "—"} icon={Hash} hint={`${formatPoints(s.points)} pts de equipe`} />
       </StatGroup>
+      )}
 
-      <div className="grid gap-10 xl:grid-cols-[1.4fr_1fr]">
+      <div className="grid items-start gap-10 xl:grid-cols-[1.4fr_1fr]">
         <Section title="Próximos campeonatos" action={<Link href="/painel/campeonatos" className="text-sm text-primary-text hover:underline">Ver todos</Link>}>
           {active.length ? (
             <ul className="divide-y rounded-3xl bg-card">
@@ -53,7 +58,7 @@ export default async function DashboardPage() {
                   <Link href={`/campeonatos/${r.tournament.slug}`} className="flex flex-wrap items-center gap-3 p-3 hover:bg-muted/40">
                     <Avatar src={r.team.logo_url} name={r.team.name} />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{r.tournament.name} {r.tournament.is_demo && <DemoBadge />}</p>
+                      <p className="truncate font-medium">{r.tournament.name}</p>
                       <p className="text-xs text-muted-foreground">{r.team.name} · {formatDateTime(r.tournament.starts_at)}</p>
                     </div>
                     <div className="flex basis-full gap-3 pl-12 sm:basis-auto sm:pl-0"><RegistrationBadge status={r.status} /><StatusBadge status={r.tournament.status} /></div>
@@ -88,28 +93,27 @@ export default async function DashboardPage() {
         </Section>
       </div>
 
-      <div className="grid gap-10 xl:grid-cols-2">
-        <Section title="Atividade recente" action={<Link href="/painel/notificacoes" className="text-sm text-primary-text hover:underline">Ver tudo</Link>}>
-          {(notifs.data ?? []).length ? (
-            <ul className="divide-y rounded-3xl bg-card">
-              {(notifs.data as Notification[]).map((n) => (
-                <li key={n.id} className="flex gap-3 p-3">
-                  <span className={`mt-1.5 size-2 shrink-0 rounded-full ${n.read_at ? "bg-muted" : "bg-primary"}`} aria-hidden />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">{n.link ? <Link href={n.link} className="hover:text-primary-text">{n.title}</Link> : n.title}</p>
-                    {n.body && <p className="line-clamp-2 text-xs text-muted-foreground">{n.body}</p>}
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">{formatRelative(n.created_at)}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : <EmptyState icon={Bell} title="Sem atividades por enquanto" />}
-        </Section>
-
-        <Section title="Conquistas">
-          <AchievementGrid items={(achievements.data ?? []) as unknown as AchievementRow[]} />
-        </Section>
-      </div>
+      {(notifications.length > 0 || earned.length > 0) && (
+        <div className="grid items-start gap-10 xl:grid-cols-2">
+          {notifications.length > 0 && (
+            <Section title="Atividade recente" action={<Link href="/painel/notificacoes" className="text-sm text-primary-text hover:underline">Ver tudo</Link>}>
+              <ul className="divide-y rounded-3xl bg-card">
+                {notifications.map((n) => (
+                  <li key={n.id} className="flex gap-3 p-3">
+                    <span className={`mt-1.5 size-2 shrink-0 rounded-full ${n.read_at ? "bg-muted" : "bg-primary"}`} aria-hidden />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{n.link ? <Link href={n.link} className="hover:text-primary-text">{n.title}</Link> : n.title}</p>
+                      {n.body && <p className="line-clamp-2 text-xs text-muted-foreground">{n.body}</p>}
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">{formatRelative(n.created_at)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+          {earned.length > 0 && <Section title="Conquistas"><AchievementGrid items={earned} /></Section>}
+        </div>
+      )}
     </div>
   );
 }

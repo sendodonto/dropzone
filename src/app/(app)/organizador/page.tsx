@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { EmptyState, PageHeader, Section, StatGroup, StatTile, StatusBadge } from "@/components/shared/ui-bits";
 import { requireOrganizer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime, formatMoney, formatRelative } from "@/lib/format";
+import { auditLabel, formatDateTime, formatMoney, formatRelative } from "@/lib/format";
 import type { Tournament } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Painel do organizador" };
@@ -56,7 +56,7 @@ export default async function OrganizerHome() {
         <StatTile label="Vagas restantes" value={o.open_slots ?? 0} icon={ListChecks} hint="Inscrições abertas" />
       </StatGroup>
 
-      <div className="grid gap-10 xl:grid-cols-[1.4fr_1fr]">
+      <div className="grid items-start gap-10 xl:grid-cols-[1.4fr_1fr]">
         <Section title="Próximas partidas">
           {(nextMatches ?? []).length ? (
             <ul className="divide-y rounded-3xl bg-card">
@@ -77,10 +77,10 @@ export default async function OrganizerHome() {
         </Section>
         <Section title="Atividade recente">
           {(logs ?? []).length ? (
-            <ul className="grid gap-2 text-sm">
+            <ul className="divide-y text-sm">
               {(logs as unknown as { id: number; action: string; created_at: string; tournament: { name: string } }[]).map((l) => (
-                <li key={l.id} className="flex justify-between gap-3 border-b pb-2 last:border-0">
-                  <span className="truncate"><span className="font-mono text-xs text-primary-text">{l.action}</span> · {l.tournament.name}</span>
+                <li key={l.id} className="flex justify-between gap-3 py-2.5">
+                  <span className="truncate"><span className="font-medium">{auditLabel(l.action)}</span> <span className="text-muted-foreground">· {l.tournament.name}</span></span>
                   <span className="shrink-0 text-xs text-muted-foreground">{formatRelative(l.created_at)}</span>
                 </li>
               ))}
@@ -89,22 +89,19 @@ export default async function OrganizerHome() {
         </Section>
       </div>
 
-      <Section title="Financeiro">
-        <div className="grid gap-3 sm:grid-cols-[16rem_1fr]">
-          <StatGroup><StatTile label="Receita registrada" value={formatMoney(o.revenue_cents)} icon={CircleDollarSign} hint="Pagamentos confirmados, líquidos de taxa" /></StatGroup>
-          <div className="rounded-3xl bg-card p-4 text-sm">
-            {(payments ?? []).length ? (
-              <ul className="grid gap-2">
-                {(payments as unknown as { id: string; amount_cents: number; status: string; created_at: string; tournament: { name: string } }[]).map((p) => (
-                  <li key={p.id} className="flex justify-between"><span>{p.tournament.name} · {p.status}</span><span>{formatMoney(p.amount_cents)}</span></li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">Nenhuma transação. Inscrições pagas ainda não estão habilitadas na plataforma; quando forem, o histórico financeiro aparecerá aqui.</p>
-            )}
+      {/* Payments are disabled platform-wide; the section appears once there is money to show. */}
+      {(payments ?? []).length > 0 && (
+        <Section title="Financeiro">
+          <div className="grid gap-3 sm:grid-cols-[16rem_1fr]">
+            <StatGroup><StatTile label="Receita registrada" value={formatMoney(o.revenue_cents)} icon={CircleDollarSign} hint="Pagamentos confirmados, líquidos de taxa" /></StatGroup>
+            <ul className="grid gap-2 rounded-3xl bg-card p-4 text-sm">
+              {(payments as unknown as { id: string; amount_cents: number; status: string; created_at: string; tournament: { name: string } }[]).map((p) => (
+                <li key={p.id} className="flex justify-between"><span>{p.tournament.name} · {p.status}</span><span>{formatMoney(p.amount_cents)}</span></li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
     </div>
   );
 }

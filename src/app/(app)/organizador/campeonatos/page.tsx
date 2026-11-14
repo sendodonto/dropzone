@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus, Trophy } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { DemoBadge, EmptyState, PageHeader, StatusBadge } from "@/components/shared/ui-bits";
+import { EmptyState, PageHeader, StatusBadge } from "@/components/shared/ui-bits";
 import { requireOrganizer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime, modeLabel } from "@/lib/format";
@@ -27,7 +27,7 @@ export default async function OrganizerTournaments() {
             <li key={t.id}>
               <Link href={`/organizador/campeonatos/${t.id}`} className="flex flex-wrap items-center gap-3 p-4 hover:bg-muted/40">
                 <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-2 truncate font-medium">{t.name} {t.is_demo && <DemoBadge />} {t.hidden_by_admin && <span className="text-xs text-destructive">(oculto pela moderação)</span>}</p>
+                  <p className="flex items-center gap-2 truncate font-medium">{t.name} {t.hidden_by_admin && <span className="text-xs text-destructive">(oculto pela moderação)</span>}</p>
                   <p className="text-xs text-muted-foreground">{modeLabel[t.mode]} · {formatDateTime(t.starts_at)} · {t.registrations?.[0]?.count ?? 0}/{t.max_teams} equipes</p>
                 </div>
                 <StatusBadge status={t.status} />

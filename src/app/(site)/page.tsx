@@ -1,41 +1,32 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { ArrowRight, ArrowUpRight, Search, ShieldCheck, Trophy } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Search } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { TournamentCard, SlotBar } from "@/components/tournament/tournament-card";
-import { Avatar, EmptyState, StatusBadge } from "@/components/shared/ui-bits";
+import { StatusBadge } from "@/components/shared/ui-bits";
 import { createClient } from "@/lib/supabase/server";
 import { listTournaments, regCount } from "@/lib/queries";
-import { formatDate, formatDateTime, formatPoints, modeLabel, plural } from "@/lib/format";
+import { formatDate, formatDateTime, formatPoints } from "@/lib/format";
 import { site } from "@/config/site";
 import { cn } from "@/lib/utils";
 
-const quick = [
-  { label: "Inscrições abertas", href: "/campeonatos?status=open" },
-  { label: "Ao vivo", href: "/campeonatos?status=live" },
-  { label: "Gratuitos", href: "/campeonatos?price=free" },
-  { label: "Com vagas", href: "/campeonatos?slots=available" },
-];
-
 type TeamRow = { team_id: string; rank: number; name: string; tag: string; slug: string; logo_url: string | null; points: number; wins: number };
 type PlayerRow = { user_id: string; rank: number; username: string; display_name: string; avatar_url: string | null; kills: number; tournaments: number };
-type OrgRow = { organizer_id: string; name: string; slug: string; logo_url: string | null; is_official: boolean; tournaments: number; teams_hosted: number };
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const [all, teamsRank, playersRank, orgRank] = await Promise.all([
+  const [all, teamsRank, playersRank] = await Promise.all([
     listTournaments({ limit: 60 }),
     supabase.rpc("get_team_rankings", { p_limit: 5 }),
     supabase.rpc("get_player_rankings", { p_limit: 5 }),
-    supabase.rpc("get_organizer_rankings", { p_limit: 4 }),
   ]);
 
   const active = all.filter((t) => ["registration_open", "registration_closed", "live"].includes(t.status));
   const byPriority = [...active].sort((a, b) =>
     Number(b.status === "live") - Number(a.status === "live") || Number(b.featured) - Number(a.featured) || +new Date(a.starts_at) - +new Date(b.starts_at));
   const now = byPriority.slice(0, 4);
-  const open = active.filter((t) => t.status === "registration_open").slice(0, 6);
-  const upcoming = active.filter((t) => t.status !== "live").slice(0, 5);
+  // The hero card already lists the first four; this grid only adds what it left out.
+  const open = active.filter((t) => t.status === "registration_open" && !now.some((n) => n.id === t.id)).slice(0, 6);
   const finished = all.filter((t) => t.status === "finished").sort((a, b) => +new Date(b.starts_at) - +new Date(a.starts_at)).slice(0, 4);
   const champions = finished.length
     ? (await supabase.from("tournament_registrations").select("tournament_id, team:teams(name, tag, slug, logo_url)")
@@ -43,7 +34,6 @@ export default async function HomePage() {
     : [];
   const teams = (teamsRank.data ?? []) as TeamRow[];
   const players = (playersRank.data ?? []) as PlayerRow[];
-  const orgs = (orgRank.data ?? []) as OrgRow[];
 
   return (
     <>
@@ -67,11 +57,6 @@ export default async function HomePage() {
                 Buscar <ArrowRight />
               </Button>
             </form>
-            <nav aria-label="Atalhos" className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-              {quick.map((q) => (
-                <Link key={q.href} href={q.href} className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">{q.label}</Link>
-              ))}
-            </nav>
           </div>
 
           {/* Live proof: the actual tournaments on the platform right now */}
@@ -103,28 +88,18 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto grid max-w-7xl gap-20 px-4 py-16 sm:px-6 lg:py-24">
-        {/* ── Open registrations ── */}
-        <section aria-labelledby="abertos" className="grid gap-6">
-          <SectionHead id="abertos" title="Inscrições abertas" href="/campeonatos?status=open" link="Ver todos" />
-          {open.length ? (
-            <div className={cn("grid gap-4 sm:grid-cols-2", open.length === 4 ? "lg:grid-cols-2" : "lg:grid-cols-3")}>
+        {/* ── More open registrations (beyond the hero card) ── */}
+        {open.length > 0 && (
+          <section aria-labelledby="abertos" className="grid gap-6">
+            <SectionHead id="abertos" title="Mais inscrições abertas" href="/campeonatos?status=open" link="Ver todos" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {open.map((t) => <TournamentCard key={t.id} t={t} />)}
             </div>
-          ) : (
-            <EmptyState icon={Trophy} title="Nenhuma inscrição aberta agora" description="Volte em breve ou crie o seu campeonato."
-              action={<Link href="/organizador/comecar" className={buttonVariants()}>Organizar campeonato</Link>} />
-          )}
-        </section>
+          </section>
+        )}
 
         {/* ── Agenda and rankings ── */}
-        <section aria-label="Agenda e rankings" className="grid gap-x-10 gap-y-14 lg:grid-cols-3">
-          <RankedList title="Agenda" href="/campeonatos?status=upcoming" link="Ver agenda"
-            empty="Nenhum torneio agendado."
-            rows={upcoming.map((t) => ({
-              key: t.id, href: `/campeonatos/${t.slug}`, lead: formatDate(t.starts_at), date: true,
-              title: t.name, sub: `${t.organizer?.name} · ${modeLabel[t.mode]}`,
-              tail: <span className="text-xs tabular-nums text-muted-foreground">{regCount(t)}/{t.max_teams}</span>,
-            }))} />
+        <section aria-label="Rankings" className="grid gap-x-12 gap-y-14 lg:grid-cols-2">
           <RankedList title="Ranking de squads" href="/rankings" link="Completo"
             empty="O ranking aparece após o primeiro campeonato finalizado."
             rows={teams.map((t) => ({
@@ -136,30 +111,11 @@ export default async function HomePage() {
             empty="O ranking aparece após o primeiro campeonato finalizado."
             rows={players.map((p) => ({
               key: p.user_id, href: `/jogadores/${p.username}`, lead: String(p.rank), first: p.rank === 1,
-              title: p.display_name ?? p.username, sub: `@${p.username}`,
+              title: p.display_name ?? p.username,
               tail: <span className="text-sm tabular-nums">{p.kills} <span className="text-muted-foreground">abates</span></span>,
             }))} />
         </section>
 
-        {/* ── Organizers ── */}
-        {orgs.length > 0 && (
-          <section aria-labelledby="org" className="grid gap-6">
-            <SectionHead id="org" title="Organizadores em destaque" />
-            <ul className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
-              {orgs.map((o) => (
-                <li key={o.organizer_id}>
-                  <Link href={`/organizadores/${o.slug}`} className="group flex items-center gap-3">
-                    <Avatar src={o.logo_url} name={o.name} size="lg" />
-                    <span className="min-w-0">
-                      <span className="flex items-center gap-1 truncate font-semibold group-hover:text-primary-text">{o.name}{o.is_official && <ShieldCheck className="size-4 shrink-0 text-primary-text" aria-label="Oficial" />}</span>
-                      <span className="block text-sm text-muted-foreground">{plural(o.tournaments, "campeonato", "campeonatos")} · {plural(o.teams_hosted, "squad", "squads")}</span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
 
         {/* ── How it works ── */}
         <section aria-labelledby="como" className="grid gap-10 border-t pt-14 lg:grid-cols-[0.75fr_1.25fr]">
@@ -234,7 +190,7 @@ function SectionHead({ id, title, href, link }: { id: string; title: string; hre
   );
 }
 
-type Row = { key: string; href: string; lead: string; date?: boolean; first?: boolean; title: string; sub: string; tail: React.ReactNode };
+type Row = { key: string; href: string; lead: string; first?: boolean; title: string; sub?: string; tail: React.ReactNode };
 
 function RankedList({ title, href, link, rows, empty }: { title: string; href: string; link: string; rows: Row[]; empty: string }) {
   return (
@@ -248,17 +204,10 @@ function RankedList({ title, href, link, rows, empty }: { title: string; href: s
           {rows.map((r) => (
             <li key={r.key}>
               <Link href={r.href} className="press -mx-2 flex items-center gap-3 rounded-md px-2 py-3 hover:bg-muted/70">
-                {r.date ? (
-                  <span className="grid w-12 shrink-0 text-center leading-none">
-                    <span className="font-heading text-lg tabular-nums">{r.lead.split(" ")[0]}</span>
-                    <span className="mt-0.5 text-[0.7rem] text-muted-foreground">{r.lead.split(" ")[2]}</span>
-                  </span>
-                ) : (
-                  <span className={cn("w-12 shrink-0 font-heading text-sm tabular-nums", r.first ? "text-primary-text" : "text-muted-foreground")}>{r.lead}</span>
-                )}
+                <span className={cn("w-12 shrink-0 font-heading text-sm tabular-nums", r.first ? "text-primary-text" : "text-muted-foreground")}>{r.lead}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{r.title}</span>
-                  <span className="block truncate text-xs text-muted-foreground">{r.sub}</span>
+                  {r.sub && <span className="block truncate text-xs text-muted-foreground">{r.sub}</span>}
                 </span>
                 {r.tail}
               </Link>

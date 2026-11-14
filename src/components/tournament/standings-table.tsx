@@ -36,7 +36,6 @@ export function StandingsTable({ rows, highlight, totalMatches }: { rows: Standi
                   <Link href={`/equipes/${r.team_slug}`} className="flex min-w-0 items-center gap-2.5 hover:text-primary-text">
                     <Avatar src={r.team_logo} name={r.team_name} size="sm" />
                     <span className="truncate font-medium">{r.team_name}</span>
-                    <span className="hidden text-xs text-muted-foreground sm:inline">[{r.team_tag}]</span>
                   </Link>
                 </td>
                 <td className="hidden px-3 py-2.5 text-right tabular-nums text-muted-foreground sm:table-cell">{r.matches_played}{totalMatches ? `/${totalMatches}` : ""}</td>

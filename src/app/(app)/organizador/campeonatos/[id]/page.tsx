@@ -19,7 +19,7 @@ import { getMatchResults, getTournamentBundle } from "@/lib/tournament";
 import { getStandings } from "@/lib/queries";
 import { deleteAnnouncement, postAnnouncement, reviewRegistration } from "@/lib/actions/tournaments";
 import { publishResults, setMatchLive, setRoomPublished } from "@/lib/actions/matches";
-import { formatDateTime, formatRelative, isoToLocalInput } from "@/lib/format";
+import { auditLabel, formatDateTime, formatRelative, isoToLocalInput } from "@/lib/format";
 import { DEFAULT_SCORING } from "@/lib/scoring";
 import { site } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -303,7 +303,7 @@ async function HistoryTab({ tournamentId }: { tournamentId: string }) {
     <ul className="divide-y rounded-3xl bg-card text-sm">
       {list.map((l) => (
         <li key={l.id} className="grid gap-1 p-3 sm:grid-cols-[10rem_1fr_auto] sm:items-center">
-          <span className="font-mono text-xs text-primary-text">{l.action}</span>
+          <span className="text-xs font-medium">{auditLabel(l.action)}</span>
           <span className="truncate text-xs text-muted-foreground" title={JSON.stringify(l.data)}>{summarize(l.data)}</span>
           <span className="text-xs text-muted-foreground">@{l.actor?.username ?? "sistema"} · {formatDateTime(l.created_at)}</span>
         </li>
